@@ -1,7 +1,10 @@
 package activecampaign
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 type Contacts struct {
@@ -41,23 +44,72 @@ type ContactLinks struct {
 	AutomationEntryCounts string `json:"automationEntryCounts"`
 }
 
-func (ac *ActiveCampaign) GetContacts() (*Contacts, error) {
+type ContactSync struct {
+	Email       string        `json:"email"`
+	FirstName   string        `json:"firstName,omitempty"`
+	LastName    string        `json:"lastName,omitempty"`
+	Phone       string        `json:"phone,omitempty"`
+	FieldValues []CustomField `json:"fieldValues,omitempty"`
+}
+
+type ContactSynced struct {
+	Email      string       `json:"email"`
+	FirstName  string       `json:"firstName"`
+	LastName   string       `json:"lastName"`
+	Phone      string       `json:"phone"`
+	CreateDate string       `json:"cdate"`
+	UpdateDate string       `json:"udate"`
+	Links      ContactLinks `json:"links"`
+	ID         string       `json:"id"`
+}
+
+type GetContactsFilter struct {
+	Email *string
+}
+
+func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, error) {
 	urlStr := fmt.Sprintf("%s/contacts", ac.baseURL())
 
-	contacts := Contacts{}
+	if filter != nil {
+		params := url.Values{}
 
-	//for urlStr != "" {
-	//co := []Contact{}
+		if filter.Email != nil {
+			params.Add("email", *filter.Email)
+		}
+
+		urlStr = fmt.Sprintf("%s?%s", urlStr, params.Encode())
+	}
+
+	contacts := Contacts{}
 
 	err := ac.get(urlStr, &contacts)
 	if err != nil {
 		return nil, err
 	}
 
-	//contacts = append(contacts, co...)
-
-	//urlStr = str
-	//}
-
 	return &contacts, nil
+}
+
+func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced, error) {
+	urlStr := fmt.Sprintf("%s/contact/sync", ac.baseURL())
+
+	b, err := json.Marshal(struct {
+		Contact ContactSync `json:"contact"`
+	}{
+		Contact: contactCreate,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var contactCreated struct {
+		Contact ContactSynced `json:"contact"`
+	}
+
+	err = ac.post(urlStr, bytes.NewBuffer(b), &contactCreated)
+	if err != nil {
+		return nil, err
+	}
+
+	return &contactCreated.Contact, nil
 }
