@@ -1,8 +1,5 @@
-module github.com/Leapforce-nl/go_activecampaign
+module github.com/leapforce-libraries/go_activecampaign
 
 go 1.13
 
-require (
-	github.com/Leapforce-nl/go_types v0.0.0-20200126202922-ba4900de15b8
-	github.com/Leapforce-nl/go_utilities v0.0.0-20200903103120-756bd24ddc04
-)
+require github.com/leapforce-libraries/go_types v0.0.0-20201101222114-6d3ec3839c8c

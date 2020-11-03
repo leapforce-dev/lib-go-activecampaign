@@ -4,3 +4,5 @@ github.com/Leapforce-nl/go_utilities v0.0.0-20200903103120-756bd24ddc04 h1:HyQLP
 github.com/Leapforce-nl/go_utilities v0.0.0-20200903103120-756bd24ddc04/go.mod h1:M1X6g0Ck9Vr68xjLY9wrVoli51cxEqljpWDXtfukqO4=
 github.com/gofrs/uuid v3.2.0+incompatible h1:y12jRkkFxsd7GpqdSZ+/KCs/fJbqpEXSGd4+jfEaewE=
 github.com/gofrs/uuid v3.2.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
+github.com/leapforce-libraries/go_types v0.0.0-20201101222114-6d3ec3839c8c h1:4GY1e071Gyk2sBn8mMVi2rI+DUnqIUP3/IAHvND39w8=
+github.com/leapforce-libraries/go_types v0.0.0-20201101222114-6d3ec3839c8c/go.mod h1:0k0QPi4o2OO3yau759B2U5XIEPbuYTf56QxyF8WdV4o=
