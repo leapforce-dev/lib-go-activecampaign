@@ -65,7 +65,7 @@ func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
 		fields.Fields = append(fields.Fields, fields_.Fields...)
 		rowCount += len(fields_.Fields)
 
-		total, err := strconv.Atoi(fields.Meta.Total)
+		total, err := strconv.Atoi(fields_.Meta.Total)
 		if err != nil {
 			return nil, err
 		}
@@ -73,7 +73,6 @@ func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
 		if rowCount >= total {
 			break
 		}
-
 	}
 
 	return &fields, nil
