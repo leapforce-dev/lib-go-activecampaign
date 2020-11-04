@@ -14,6 +14,7 @@ import (
 const (
 	apiName string = "ActiveCampaign"
 	apiURL  string = "https://%s.api-us1.com/api/3"
+	limit   int    = 20
 )
 
 type ActiveCampaign struct {
@@ -50,6 +51,10 @@ func NewActiveCampaign(accountName string, apiKey string) (*ActiveCampaign, erro
 
 func (ac *ActiveCampaign) baseURL() string {
 	return fmt.Sprintf(apiURL, ac.accountName)
+}
+
+func (ac *ActiveCampaign) limit() int {
+	return limit
 }
 
 func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Reader) (*http.Response, error) {

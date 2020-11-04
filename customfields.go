@@ -2,6 +2,7 @@ package activecampaign
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Fields struct {
@@ -47,13 +48,32 @@ type FieldLink struct {
 }
 
 func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
-	urlStr := fmt.Sprintf("%s/fields", ac.baseURL())
+	rowCount := 0
 
 	fields := Fields{}
 
-	err := ac.get(urlStr, &fields)
-	if err != nil {
-		return nil, err
+	for true {
+		urlStr := fmt.Sprintf("%s/fields?limit=%v&offset=%v", ac.baseURL(), ac.limit(), rowCount)
+
+		fields_ := Fields{}
+
+		err := ac.get(urlStr, &fields_)
+		if err != nil {
+			return nil, err
+		}
+
+		fields.Fields = append(fields.Fields, fields_.Fields...)
+		rowCount += len(fields_.Fields)
+
+		total, err := strconv.Atoi(fields.Meta.Total)
+		if err != nil {
+			return nil, err
+		}
+
+		if rowCount >= total {
+			break
+		}
+
 	}
 
 	return &fields, nil
