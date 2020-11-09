@@ -65,6 +65,10 @@ func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Rea
 
 	// Add authorization token to header
 	req.Header.Set("Api-Token", ac.apiKey)
+	req.Header.Set("Accept", "application/json")
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	// Send out the HTTP request
 	response, err := ac.Client.Do(req)
@@ -104,6 +108,7 @@ func (ac *ActiveCampaign) get(url string, model interface{}) error {
 
 func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{}) error {
 	res, err := ac.httpRequest(http.MethodPost, url, buf)
+
 	if err != nil {
 		if res != nil {
 			defer res.Body.Close()
@@ -128,16 +133,18 @@ func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{})
 		}
 	}
 
-	defer res.Body.Close()
+	if model != nil {
+		defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
 
-	err = json.Unmarshal(b, &model)
-	if err != nil {
-		return err
+		err = json.Unmarshal(b, &model)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
