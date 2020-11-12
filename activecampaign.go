@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	types "github.com/leapforce-libraries/go_types"
 )
@@ -70,8 +71,26 @@ func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Rea
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	// Send out the HTTP request
-	response, err := ac.Client.Do(req)
+	attempts := 10
+	attempt := 1
+
+	response := new(http.Response)
+
+	for attempt < attempts {
+
+		// Send out the HTTP request
+		response, err = ac.Client.Do(req)
+		if err != nil {
+			attempt++
+			fmt.Println("url:", url)
+			fmt.Println("error:", err.Error())
+			fmt.Println("starting attempt:", attempt)
+
+			time.Sleep(5 * time.Second)
+		} else {
+			break
+		}
+	}
 
 	// Check HTTP StatusCode
 	if response.StatusCode < 200 || response.StatusCode > 299 {
