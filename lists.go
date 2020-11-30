@@ -3,6 +3,8 @@ package activecampaign
 import (
 	"encoding/json"
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type Lists struct {
@@ -71,14 +73,14 @@ type ListLinks struct {
 	Sitemessages string `json:"sitemessages"`
 }
 
-func (ac *ActiveCampaign) GetLists() (*Lists, error) {
+func (ac *ActiveCampaign) GetLists() (*Lists, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/lists", ac.baseURL())
 
 	lists := Lists{}
 
-	err := ac.get(urlStr, &lists)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &lists)
+	if e != nil {
+		return nil, e
 	}
 
 	return &lists, nil

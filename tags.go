@@ -2,6 +2,8 @@ package activecampaign
 
 import (
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type Tags struct {
@@ -31,14 +33,14 @@ type GetTagsFilter struct {
 	Email *string
 }
 
-func (ac *ActiveCampaign) GetTags() (*Tags, error) {
+func (ac *ActiveCampaign) GetTags() (*Tags, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/tags", ac.baseURL())
 
 	tags := Tags{}
 
-	err := ac.get(urlStr, &tags)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &tags)
+	if e != nil {
+		return nil, e
 	}
 
 	return &tags, nil

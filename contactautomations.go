@@ -2,6 +2,8 @@ package activecampaign
 
 import (
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type ContactAutomations struct {
@@ -37,14 +39,14 @@ type ContactAutomationLinks struct {
 	AutomationLogs string `json:"automationLogs"`
 }
 
-func (ac *ActiveCampaign) GetContactAutomations(automationID string) (*ContactAutomations, error) {
+func (ac *ActiveCampaign) GetContactAutomations(automationID string) (*ContactAutomations, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/automations/%s/contactAutomations", ac.baseURL(), automationID)
 
 	contactAutomations := ContactAutomations{}
 
-	err := ac.get(urlStr, &contactAutomations)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &contactAutomations)
+	if e != nil {
+		return nil, e
 	}
 
 	return &contactAutomations, nil

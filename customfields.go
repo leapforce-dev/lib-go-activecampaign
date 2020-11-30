@@ -3,6 +3,8 @@ package activecampaign
 import (
 	"fmt"
 	"strconv"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type Fields struct {
@@ -47,7 +49,7 @@ type FieldLink struct {
 	Relations string `json:"Relations"`
 }
 
-func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
+func (ac *ActiveCampaign) GetCustomFields() (*Fields, *errortools.Error) {
 	rowCount := 0
 
 	fields := Fields{}
@@ -57,9 +59,9 @@ func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
 
 		fields_ := Fields{}
 
-		err := ac.get(urlStr, &fields_)
-		if err != nil {
-			return nil, err
+		e := ac.get(urlStr, &fields_)
+		if e != nil {
+			return nil, e
 		}
 
 		fields.Fields = append(fields.Fields, fields_.Fields...)
@@ -67,7 +69,7 @@ func (ac *ActiveCampaign) GetCustomFields() (*Fields, error) {
 
 		total, err := strconv.Atoi(fields_.Meta.Total)
 		if err != nil {
-			return nil, err
+			return nil, errortools.ErrorMessage(err)
 		}
 
 		if rowCount >= total {

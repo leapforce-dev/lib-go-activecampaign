@@ -2,6 +2,8 @@ package activecampaign
 
 import (
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type Automations struct {
@@ -37,14 +39,14 @@ type GetAutomationsFilter struct {
 	Email *string
 }
 
-func (ac *ActiveCampaign) GetAutomations() (*Automations, error) {
+func (ac *ActiveCampaign) GetAutomations() (*Automations, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/automations", ac.baseURL())
 
 	automations := Automations{}
 
-	err := ac.get(urlStr, &automations)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &automations)
+	if e != nil {
+		return nil, e
 	}
 
 	return &automations, nil

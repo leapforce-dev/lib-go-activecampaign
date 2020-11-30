@@ -7,9 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 
-	types "github.com/leapforce-libraries/go_types"
+	errortools "github.com/leapforce-libraries/go_errortools"
+	utilities "github.com/leapforce-libraries/go_utilities"
 )
 
 const (
@@ -41,13 +41,13 @@ type CustomField struct {
 	Value string `json:"value"`
 }
 
-func NewActiveCampaign(accountName string, apiKey string) (*ActiveCampaign, error) {
+func NewActiveCampaign(accountName string, apiKey string) *ActiveCampaign {
 	ac := ActiveCampaign{}
 	ac.accountName = accountName
 	ac.apiKey = apiKey
 	ac.Client = http.Client{}
 
-	return &ac, nil
+	return &ac
 }
 
 func (ac *ActiveCampaign) baseURL() string {
@@ -58,111 +58,109 @@ func (ac *ActiveCampaign) limit() int {
 	return limit
 }
 
-func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(httpMethod, url, body)
+func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Reader) (*http.Request, *http.Response, *errortools.Error) {
+	e := new(errortools.Error)
+
+	request, err := http.NewRequest(httpMethod, url, body)
+	e.SetRequest(request)
 	if err != nil {
-		return nil, err
+		e.SetMessage(err)
+		return request, nil, e
 	}
 
 	// Add authorization token to header
-	req.Header.Set("Api-Token", ac.apiKey)
-	req.Header.Set("Accept", "application/json")
+	request.Header.Set("Api-Token", ac.apiKey)
+	request.Header.Set("Accept", "application/json")
 	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Content-Type", "application/json")
 	}
 
-	attempts := 10
-	attempt := 1
+	response, err := utilities.DoWithRetry(&ac.Client, request, 10, 5)
+	e.SetResponse(response)
 
-	response := new(http.Response)
-
-	for attempt < attempts {
-
-		// Send out the HTTP request
-		response, err = ac.Client.Do(req)
-		if err != nil {
-			attempt++
-			fmt.Println("url:", url)
-			fmt.Println("error:", err.Error())
-			fmt.Println("starting attempt:", attempt)
-
-			time.Sleep(5 * time.Second)
-		} else {
-			break
-		}
-	}
-
-	// Check HTTP StatusCode
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		message := fmt.Sprintf("Server returned statuscode %v", response.StatusCode)
-		return response, &types.ErrorString{message}
-	}
 	if err != nil {
-		return response, err
+		e.SetMessage(err)
+		return request, response, e
 	}
 
-	return response, nil
+	return request, response, nil
 }
 
-func (ac *ActiveCampaign) get(url string, model interface{}) error {
-	res, err := ac.httpRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return err
+func (ac *ActiveCampaign) get(url string, model interface{}) *errortools.Error {
+	request, response, e := ac.httpRequest(http.MethodGet, url, nil)
+	if e != nil {
+		return e
 	}
 
-	defer res.Body.Close()
+	e = new(errortools.Error)
+	e.SetRequest(request)
+	e.SetResponse(response)
 
-	b, err := ioutil.ReadAll(res.Body)
+	defer response.Body.Close()
+
+	b, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return err
+		e.SetMessage(err)
+		return e
 	}
 
 	err = json.Unmarshal(b, &model)
 	if err != nil {
-		return err
+		e.SetMessage(err)
+		return e
 	}
 
 	return nil
 }
 
-func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{}) error {
-	res, err := ac.httpRequest(http.MethodPost, url, buf)
+func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{}) *errortools.Error {
+	request, response, e := ac.httpRequest(http.MethodPost, url, buf)
 
-	if err != nil {
-		if res != nil {
-			defer res.Body.Close()
+	if e != nil {
+		if response != nil {
 
-			b, errRead := ioutil.ReadAll(res.Body)
-			if errRead != nil {
-				return err
+			e = new(errortools.Error)
+			e.SetRequest(request)
+			e.SetResponse(response)
+
+			defer response.Body.Close()
+
+			b, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				e.SetMessage(err)
+				return e
 			}
 
 			var errors struct {
 				Errors []ActiveCampaignError `json:"errors"`
 			}
 
-			errUnmarshal := json.Unmarshal(b, &errors)
-			if errUnmarshal != nil {
-				return err
+			err = json.Unmarshal(b, &errors)
+			if err != nil {
+				e.SetMessage(err)
+				return e
 			}
 
-			return &types.ErrorString{fmt.Sprintf("Error: %v, title: %s", err, errors.Errors[0].Title)}
+			e.SetMessage(fmt.Sprintf("Error: %v, title: %s", err, errors.Errors[0].Title))
+			return e
 		} else {
-			return err
+			return e
 		}
 	}
 
 	if model != nil {
-		defer res.Body.Close()
+		defer response.Body.Close()
 
-		b, err := ioutil.ReadAll(res.Body)
+		b, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			return err
+			e.SetMessage(err)
+			return e
 		}
 
 		err = json.Unmarshal(b, &model)
 		if err != nil {
-			return err
+			e.SetMessage(err)
+			return e
 		}
 	}
 

@@ -2,6 +2,8 @@ package activecampaign
 
 import (
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type ContactTags struct {
@@ -26,14 +28,14 @@ type ContactTagLinks struct {
 	Contact string `json:"contact"`
 }
 
-func (ac *ActiveCampaign) GetContactTags(contactID string) (*ContactTags, error) {
+func (ac *ActiveCampaign) GetContactTags(contactID string) (*ContactTags, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/contacts/%s/contactTags", ac.baseURL(), contactID)
 
 	contactTags := ContactTags{}
 
-	err := ac.get(urlStr, &contactTags)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &contactTags)
+	if e != nil {
+		return nil, e
 	}
 
 	return &contactTags, nil

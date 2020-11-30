@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type Contacts struct {
@@ -67,7 +69,7 @@ type GetContactsFilter struct {
 	Email *string
 }
 
-func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, error) {
+func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/contacts", ac.baseURL())
 
 	if filter != nil {
@@ -82,15 +84,15 @@ func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, err
 
 	contacts := Contacts{}
 
-	err := ac.get(urlStr, &contacts)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &contacts)
+	if e != nil {
+		return nil, e
 	}
 
 	return &contacts, nil
 }
 
-func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced, error) {
+func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/contact/sync", ac.baseURL())
 
 	b, err := json.Marshal(struct {
@@ -99,16 +101,16 @@ func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced
 		Contact: contactCreate,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errortools.ErrorMessage(err)
 	}
 
 	var contactCreated struct {
 		Contact ContactSynced `json:"contact"`
 	}
 
-	err = ac.post(urlStr, bytes.NewBuffer(b), &contactCreated)
-	if err != nil {
-		return nil, err
+	e := ac.post(urlStr, bytes.NewBuffer(b), &contactCreated)
+	if e != nil {
+		return nil, e
 	}
 
 	return &contactCreated.Contact, nil

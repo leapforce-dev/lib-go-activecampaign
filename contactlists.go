@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 type ContactLists struct {
@@ -52,28 +54,28 @@ type ContactListLinks struct {
 	Message               string `json:"message"`
 }
 
-func (ac *ActiveCampaign) GetContactLists(contactID string) (*ContactLists, error) {
+func (ac *ActiveCampaign) GetContactLists(contactID string) (*ContactLists, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/contacts/%s/contactLists", ac.baseURL(), contactID)
 
 	contactLists := ContactLists{}
 
-	err := ac.get(urlStr, &contactLists)
-	if err != nil {
-		return nil, err
+	e := ac.get(urlStr, &contactLists)
+	if e != nil {
+		return nil, e
 	}
 
 	return &contactLists, nil
 }
 
-func (ac *ActiveCampaign) Subscribe(contactID int, listID int) error {
+func (ac *ActiveCampaign) Subscribe(contactID int, listID int) *errortools.Error {
 	return ac.setContactLists(contactID, listID, 1)
 }
 
-func (ac *ActiveCampaign) Unsubscribe(contactID int, listID int) error {
+func (ac *ActiveCampaign) Unsubscribe(contactID int, listID int) *errortools.Error {
 	return ac.setContactLists(contactID, listID, 2)
 }
 
-func (ac *ActiveCampaign) setContactLists(listID int, contactID int, status int) error {
+func (ac *ActiveCampaign) setContactLists(listID int, contactID int, status int) *errortools.Error {
 	urlStr := fmt.Sprintf("%s/contactLists", ac.baseURL())
 
 	type contactList struct {
@@ -96,14 +98,14 @@ func (ac *ActiveCampaign) setContactLists(listID int, contactID int, status int)
 
 	b, err := json.Marshal(d)
 	if err != nil {
-		return nil
+		return errortools.ErrorMessage(err)
 	}
 
 	buf := bytes.NewBuffer(b)
 
-	err = ac.post(urlStr, buf, nil)
-	if err != nil {
-		return err
+	e := ac.post(urlStr, buf, nil)
+	if e != nil {
+		return e
 	}
 
 	return nil
