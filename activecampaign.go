@@ -75,7 +75,7 @@ func (ac *ActiveCampaign) httpRequest(httpMethod string, url string, body io.Rea
 		request.Header.Set("Content-Type", "application/json")
 	}
 
-	response, err := utilities.DoWithRetry(&ac.Client, request, 10, 5)
+	response, e := utilities.DoWithRetry(&ac.Client, request, 10, 5)
 	e.SetResponse(response)
 
 	if err != nil {
