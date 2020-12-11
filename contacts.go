@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 )
@@ -66,27 +67,51 @@ type ContactSynced struct {
 }
 
 type GetContactsFilter struct {
-	Email *string
+	Limit        *uint
+	Email        *string
+	CreatedAfter *time.Time
 }
 
 func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, *errortools.Error) {
 	urlStr := fmt.Sprintf("%s/contacts", ac.baseURL())
+	params := url.Values{}
 
 	if filter != nil {
-		params := url.Values{}
-
 		if filter.Email != nil {
 			params.Add("email", *filter.Email)
 		}
-
-		urlStr = fmt.Sprintf("%s?%s", urlStr, params.Encode())
+		if filter.CreatedAfter != nil {
+			params.Add("filters[created_after]", (*filter.CreatedAfter).Format(time.RFC3339))
+		}
 	}
 
 	contacts := Contacts{}
+	offset := uint(0)
+	limit := uint(100)
+	if filter.Limit != nil {
+		limit = *filter.Limit
+	}
+	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	e := ac.get(urlStr, &contacts)
-	if e != nil {
-		return nil, e
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		urlStrBatch := fmt.Sprintf("%s?%s", urlStr, params.Encode())
+		//fmt.Println(urlStrBatch)
+
+		contactsBatch := Contacts{}
+
+		e := ac.get(urlStrBatch, &contactsBatch)
+		if e != nil {
+			return nil, e
+		}
+
+		contacts.Contacts = append(contacts.Contacts, contactsBatch.Contacts...)
+
+		if len(contactsBatch.Contacts) < int(limit) {
+			break
+		}
+		offset += limit
 	}
 
 	return &contacts, nil
@@ -114,4 +139,15 @@ func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced
 	}
 
 	return &contactCreated.Contact, nil
+}
+
+func (ac *ActiveCampaign) DeleteContact(contactID string) *errortools.Error {
+	urlStr := fmt.Sprintf("%s/contacts/%s", ac.baseURL(), contactID)
+
+	e := ac.delete(urlStr)
+	if e != nil {
+		return e
+	}
+
+	return nil
 }

@@ -148,6 +148,10 @@ func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{})
 		}
 	}
 
+	e = new(errortools.Error)
+	e.SetRequest(request)
+	e.SetResponse(response)
+
 	if model != nil {
 		defer response.Body.Close()
 
@@ -162,6 +166,15 @@ func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{})
 			e.SetMessage(err)
 			return e
 		}
+	}
+
+	return nil
+}
+
+func (ac *ActiveCampaign) delete(url string) *errortools.Error {
+	_, _, e := ac.httpRequest(http.MethodDelete, url, nil)
+	if e != nil {
+		return e
 	}
 
 	return nil
