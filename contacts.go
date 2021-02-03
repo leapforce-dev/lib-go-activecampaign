@@ -141,6 +141,30 @@ func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced
 	return &contactCreated.Contact, nil
 }
 
+func (ac *ActiveCampaign) UpdateContact(contactID string, contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
+	urlStr := fmt.Sprintf("%s/contacts/%s", ac.baseURL(), contactID)
+
+	b, err := json.Marshal(struct {
+		Contact ContactSync `json:"contact"`
+	}{
+		Contact: contactCreate,
+	})
+	if err != nil {
+		return nil, errortools.ErrorMessage(err)
+	}
+
+	var contactUpdated struct {
+		Contact ContactSynced `json:"contact"`
+	}
+
+	e := ac.put(urlStr, bytes.NewBuffer(b), &contactUpdated)
+	if e != nil {
+		return nil, e
+	}
+
+	return &contactUpdated.Contact, nil
+}
+
 func (ac *ActiveCampaign) DeleteContact(contactID string) *errortools.Error {
 	urlStr := fmt.Sprintf("%s/contacts/%s", ac.baseURL(), contactID)
 

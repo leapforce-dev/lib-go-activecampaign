@@ -171,6 +171,64 @@ func (ac *ActiveCampaign) post(url string, buf *bytes.Buffer, model interface{})
 	return nil
 }
 
+func (ac *ActiveCampaign) put(url string, buf *bytes.Buffer, model interface{}) *errortools.Error {
+	request, response, e := ac.httpRequest(http.MethodPut, url, buf)
+
+	if e != nil {
+		if response != nil {
+
+			e = new(errortools.Error)
+			e.SetRequest(request)
+			e.SetResponse(response)
+
+			defer response.Body.Close()
+
+			b, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				e.SetMessage(err)
+				return e
+			}
+
+			var errors struct {
+				Errors []ActiveCampaignError `json:"errors"`
+			}
+
+			err = json.Unmarshal(b, &errors)
+			if err != nil {
+				e.SetMessage(err)
+				return e
+			}
+
+			e.SetMessage(fmt.Sprintf("Error: %v, title: %s", err, errors.Errors[0].Title))
+			return e
+		} else {
+			return e
+		}
+	}
+
+	e = new(errortools.Error)
+	e.SetRequest(request)
+	e.SetResponse(response)
+
+	if model != nil {
+		defer response.Body.Close()
+
+		b, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			e.SetMessage(err)
+			return e
+		}
+
+		err = json.Unmarshal(b, &model)
+		if err != nil {
+			e.SetMessage(err)
+			return e
+		}
+	}
+
+	return nil
+}
+
 func (ac *ActiveCampaign) delete(url string) *errortools.Error {
 	_, _, e := ac.httpRequest(http.MethodDelete, url, nil)
 	if e != nil {
