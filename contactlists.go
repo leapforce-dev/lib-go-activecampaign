@@ -1,11 +1,11 @@
 package activecampaign
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type ContactLists struct {
@@ -54,12 +54,15 @@ type ContactListLinks struct {
 	Message               string `json:"message"`
 }
 
-func (ac *ActiveCampaign) GetContactLists(contactID string) (*ContactLists, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contacts/%s/contactLists", ac.baseURL(), contactID)
-
+func (service *Service) GetContactLists(contactID string) (*ContactLists, *errortools.Error) {
 	contactLists := ContactLists{}
 
-	e := ac.get(urlStr, &contactLists)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("contacts/%s/contactAutomations", contactID)),
+		ResponseModel: &contactLists,
+	}
+
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -67,17 +70,15 @@ func (ac *ActiveCampaign) GetContactLists(contactID string) (*ContactLists, *err
 	return &contactLists, nil
 }
 
-func (ac *ActiveCampaign) Subscribe(contactID int, listID int) *errortools.Error {
-	return ac.setContactLists(contactID, listID, 1)
+func (service *Service) Subscribe(contactID int, listID int) *errortools.Error {
+	return service.setContactLists(contactID, listID, 1)
 }
 
-func (ac *ActiveCampaign) Unsubscribe(contactID int, listID int) *errortools.Error {
-	return ac.setContactLists(contactID, listID, 2)
+func (service *Service) Unsubscribe(contactID int, listID int) *errortools.Error {
+	return service.setContactLists(contactID, listID, 2)
 }
 
-func (ac *ActiveCampaign) setContactLists(listID int, contactID int, status int) *errortools.Error {
-	urlStr := fmt.Sprintf("%s/contactLists", ac.baseURL())
-
+func (service *Service) setContactLists(listID int, contactID int, status int) *errortools.Error {
 	type contactList struct {
 		List    int `json:"list"`
 		Contact int `json:"contact"`
@@ -96,14 +97,12 @@ func (ac *ActiveCampaign) setContactLists(listID int, contactID int, status int)
 		},
 	}
 
-	b, err := json.Marshal(d)
-	if err != nil {
-		return errortools.ErrorMessage(err)
+	requestConfig := go_http.RequestConfig{
+		URL:       service.url("contactLists"),
+		BodyModel: d,
 	}
 
-	buf := bytes.NewBuffer(b)
-
-	e := ac.post(urlStr, buf, nil)
+	_, _, e := service.post(&requestConfig)
 	if e != nil {
 		return e
 	}

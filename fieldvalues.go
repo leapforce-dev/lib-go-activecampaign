@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type FieldValues struct {
@@ -29,13 +30,15 @@ type FieldValueLinks struct {
 	Field string `json:"field"`
 }
 
-func (ac *ActiveCampaign) GetFieldValues(contactID string) (*FieldValues, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contacts/%s/fieldValues", ac.baseURL(), contactID)
-	//fmt.Println(urlStr)
-
+func (service *Service) GetFieldValues(contactID string) (*FieldValues, *errortools.Error) {
 	fieldValues := FieldValues{}
 
-	e := ac.get(urlStr, &fieldValues)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("contacts/%s/fieldValues", contactID)),
+		ResponseModel: &fieldValues,
+	}
+
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}

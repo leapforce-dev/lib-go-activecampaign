@@ -1,9 +1,8 @@
 package activecampaign
 
 import (
-	"fmt"
-
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type Tags struct {
@@ -33,12 +32,15 @@ type GetTagsFilter struct {
 	Email *string
 }
 
-func (ac *ActiveCampaign) GetTags() (*Tags, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/tags", ac.baseURL())
-
+func (service *Service) GetTags() (*Tags, *errortools.Error) {
 	tags := Tags{}
 
-	e := ac.get(urlStr, &tags)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url("tags"),
+		ResponseModel: &tags,
+	}
+
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}

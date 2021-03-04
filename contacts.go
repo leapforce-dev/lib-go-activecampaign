@@ -1,13 +1,12 @@
 package activecampaign
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"time"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type Contacts struct {
@@ -72,8 +71,7 @@ type GetContactsFilter struct {
 	CreatedAfter *time.Time
 }
 
-func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contacts", ac.baseURL())
+func (service *Service) GetContacts(filter *GetContactsFilter) (*Contacts, *errortools.Error) {
 	params := url.Values{}
 
 	if filter != nil {
@@ -96,12 +94,14 @@ func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, *er
 	for true {
 		params.Set("offset", fmt.Sprintf("%v", offset))
 
-		urlStrBatch := fmt.Sprintf("%s?%s", urlStr, params.Encode())
-		//fmt.Println(urlStrBatch)
-
 		contactsBatch := Contacts{}
 
-		e := ac.get(urlStrBatch, &contactsBatch)
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
+			ResponseModel: &contactsBatch,
+		}
+
+		_, _, e := service.get(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -117,23 +117,24 @@ func (ac *ActiveCampaign) GetContacts(filter *GetContactsFilter) (*Contacts, *er
 	return &contacts, nil
 }
 
-func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contact/sync", ac.baseURL())
-
-	b, err := json.Marshal(struct {
+func (service *Service) SyncContact(contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
+	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
 		Contact: contactCreate,
-	})
-	if err != nil {
-		return nil, errortools.ErrorMessage(err)
 	}
 
 	var contactCreated struct {
 		Contact ContactSynced `json:"contact"`
 	}
 
-	e := ac.post(urlStr, bytes.NewBuffer(b), &contactCreated)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url("contact/sync"),
+		BodyModel:     d,
+		ResponseModel: &contactCreated,
+	}
+
+	_, _, e := service.post(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -141,23 +142,24 @@ func (ac *ActiveCampaign) SyncContact(contactCreate ContactSync) (*ContactSynced
 	return &contactCreated.Contact, nil
 }
 
-func (ac *ActiveCampaign) UpdateContact(contactID string, contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contacts/%s", ac.baseURL(), contactID)
-
-	b, err := json.Marshal(struct {
+func (service *Service) UpdateContact(contactID string, contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
+	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
 		Contact: contactCreate,
-	})
-	if err != nil {
-		return nil, errortools.ErrorMessage(err)
 	}
 
 	var contactUpdated struct {
 		Contact ContactSynced `json:"contact"`
 	}
 
-	e := ac.put(urlStr, bytes.NewBuffer(b), &contactUpdated)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("contacts/%s", contactID)),
+		BodyModel:     d,
+		ResponseModel: &contactUpdated,
+	}
+
+	_, _, e := service.post(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -165,10 +167,12 @@ func (ac *ActiveCampaign) UpdateContact(contactID string, contactCreate ContactS
 	return &contactUpdated.Contact, nil
 }
 
-func (ac *ActiveCampaign) DeleteContact(contactID string) *errortools.Error {
-	urlStr := fmt.Sprintf("%s/contacts/%s", ac.baseURL(), contactID)
+func (service *Service) DeleteContact(contactID string) *errortools.Error {
+	requestConfig := go_http.RequestConfig{
+		URL: service.url(fmt.Sprintf("contacts/%s", contactID)),
+	}
 
-	e := ac.delete(urlStr)
+	_, _, e := service.delete(&requestConfig)
 	if e != nil {
 		return e
 	}

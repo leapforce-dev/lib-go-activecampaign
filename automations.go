@@ -1,9 +1,8 @@
 package activecampaign
 
 import (
-	"fmt"
-
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type Automations struct {
@@ -39,12 +38,15 @@ type GetAutomationsFilter struct {
 	Email *string
 }
 
-func (ac *ActiveCampaign) GetAutomations() (*Automations, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/automations", ac.baseURL())
-
+func (service *Service) GetAutomations() (*Automations, *errortools.Error) {
 	automations := Automations{}
 
-	e := ac.get(urlStr, &automations)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url("automations"),
+		ResponseModel: &automations,
+	}
+
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}

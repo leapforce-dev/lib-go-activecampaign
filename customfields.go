@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type Fields struct {
@@ -49,17 +50,20 @@ type FieldLink struct {
 	Relations string `json:"Relations"`
 }
 
-func (ac *ActiveCampaign) GetCustomFields() (*Fields, *errortools.Error) {
+func (service *Service) GetCustomFields() (*Fields, *errortools.Error) {
 	rowCount := 0
 
 	fields := Fields{}
 
 	for true {
-		urlStr := fmt.Sprintf("%s/fields?limit=%v&offset=%v", ac.baseURL(), ac.limit(), rowCount)
-
 		fields_ := Fields{}
 
-		e := ac.get(urlStr, &fields_)
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("fields?limit=%v&offset=%v", limit, rowCount)),
+			ResponseModel: &fields_,
+		}
+
+		_, _, e := service.get(&requestConfig)
 		if e != nil {
 			return nil, e
 		}

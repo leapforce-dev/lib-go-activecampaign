@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
 )
 
 type ContactTags struct {
@@ -28,12 +29,15 @@ type ContactTagLinks struct {
 	Contact string `json:"contact"`
 }
 
-func (ac *ActiveCampaign) GetContactTags(contactID string) (*ContactTags, *errortools.Error) {
-	urlStr := fmt.Sprintf("%s/contacts/%s/contactTags", ac.baseURL(), contactID)
-
+func (service *Service) GetContactTags(contactID string) (*ContactTags, *errortools.Error) {
 	contactTags := ContactTags{}
 
-	e := ac.get(urlStr, &contactTags)
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("contacts/%s/contactTags", contactID)),
+		ResponseModel: &contactTags,
+	}
+
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
