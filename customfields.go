@@ -31,6 +31,7 @@ type FieldRelation struct {
 type Field struct {
 	Title        string `json:"title"`
 	Description  string `json:"descript"`
+	Type         string `json:"type"`
 	IsRequired   string `json:"isrequired"`
 	Perstag      string `json:"perstag"`
 	DefaultValue string `json:"defval"`
@@ -43,6 +44,18 @@ type Field struct {
 	Relations []string  `json:"relations"`
 	Links     FieldLink `json:"links"`
 	ID        string    `json:"id"`
+}
+
+type FieldUpdate struct {
+	Title        string `json:"title,omitempty"`
+	Description  string `json:"descript,omitempty"`
+	Type         string `json:"type,omitempty"`
+	IsRequired   string `json:"isrequired,omitempty"`
+	Perstag      string `json:"perstag,omitempty"`
+	DefaultValue string `json:"defval,omitempty"`
+	Visible      string `json:"visible,omitempty"`
+	Service      string `json:"service,omitempty"`
+	Ordernum     string `json:"ordernum,omitempty"`
 }
 
 type FieldLink struct {
@@ -82,4 +95,75 @@ func (service *Service) GetCustomFields() (*Fields, *errortools.Error) {
 	}
 
 	return &fields, nil
+}
+
+func (service *Service) CreateField(fieldUpdate *FieldUpdate) (*Field, *errortools.Error) {
+	if fieldUpdate == nil {
+		return nil, nil
+	}
+
+	d := struct {
+		Field FieldUpdate `json:"field"`
+	}{
+		Field: *fieldUpdate,
+	}
+
+	var fieldUpdated struct {
+		Field Field `json:"field"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url("fields"),
+		BodyModel:     d,
+		ResponseModel: &fieldUpdated,
+	}
+
+	_, _, e := service.post(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &fieldUpdated.Field, nil
+}
+
+func (service *Service) UpdateField(fieldID string, fieldUpdate *FieldUpdate) (*Field, *errortools.Error) {
+	if fieldUpdate == nil {
+		return nil, nil
+	}
+
+	d := struct {
+		Field FieldUpdate `json:"field"`
+	}{
+		Field: *fieldUpdate,
+	}
+
+	var fieldUpdated struct {
+		Field Field `json:"field"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("fields/%s", fieldID)),
+		BodyModel:     d,
+		ResponseModel: &fieldUpdated,
+	}
+
+	_, _, e := service.put(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &fieldUpdated.Field, nil
+}
+
+func (service *Service) DeleteField(fieldID string) *errortools.Error {
+	requestConfig := go_http.RequestConfig{
+		URL: service.url(fmt.Sprintf("fields/%s", fieldID)),
+	}
+
+	_, _, e := service.delete(&requestConfig)
+	if e != nil {
+		return e
+	}
+
+	return nil
 }
