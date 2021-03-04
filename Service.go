@@ -60,6 +60,12 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 		e.SetMessage(errorResponse.Errors[0].Title)
 	}
 
+	// activecampaign sometimes returns an error while the actions has succesfully been performed
+	if response.StatusCode >= 200 && response.StatusCode <= 299 {
+		errortools.CaptureError(e)
+		return request, response, nil
+	}
+
 	return request, response, e
 }
 

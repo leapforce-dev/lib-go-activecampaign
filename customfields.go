@@ -167,3 +167,31 @@ func (service *Service) DeleteField(fieldID string) *errortools.Error {
 
 	return nil
 }
+
+type FieldRelationUpdate struct {
+	Field int32 `json:"field"`
+	RelID int32 `json:"relid"`
+}
+
+func (service *Service) CreateFieldRelation(fieldID int32, listID int32) (*FieldRelation, *errortools.Error) {
+	d := struct {
+		FieldRelationUpdate `json:"fieldRel"`
+	}{
+		FieldRelationUpdate{fieldID, listID},
+	}
+
+	fieldRelation := FieldRelation{}
+
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url("fieldRels"),
+		BodyModel:     d,
+		ResponseModel: &fieldRelation,
+	}
+
+	_, _, e := service.post(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &fieldRelation, nil
+}
