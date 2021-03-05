@@ -15,14 +15,16 @@ type Contacts struct {
 }
 
 type Contact struct {
-	CreateDate string       `json:"cdate"`
-	Email      string       `json:"email"`
-	Phone      string       `json:"phone"`
-	FirstName  string       `json:"firstName,omitempty"`
-	LastName   string       `json:"lastName,omitempty"`
-	ID         string       `json:"id"`
-	UpdateDate string       `json:"udate"`
-	Links      ContactLinks `json:"links"`
+	CreateDate       string       `json:"cdate"`
+	Email            string       `json:"email"`
+	Phone            string       `json:"phone"`
+	FirstName        string       `json:"firstName,omitempty"`
+	LastName         string       `json:"lastName,omitempty"`
+	ID               string       `json:"id"`
+	UpdateDate       string       `json:"udate"`
+	Links            ContactLinks `json:"links"`
+	CreatedTimestamp string       `json:"created_timestamp"`
+	UpdatedTimestamp string       `json:"updated_timestamp"`
 }
 
 type ContactLinks struct {
@@ -65,21 +67,29 @@ type ContactSynced struct {
 	ID         string       `json:"id"`
 }
 
-type GetContactsFilter struct {
+type GetContactsConfig struct {
 	Limit        *uint
 	Email        *string
+	ListID       *string
 	CreatedAfter *time.Time
+	UpdatedAfter *time.Time
 }
 
-func (service *Service) GetContacts(filter *GetContactsFilter) (*Contacts, *errortools.Error) {
+func (service *Service) GetContacts(filter *GetContactsConfig) (*Contacts, *errortools.Error) {
 	params := url.Values{}
 
 	if filter != nil {
 		if filter.Email != nil {
 			params.Add("email", *filter.Email)
 		}
+		if filter.ListID != nil {
+			params.Add("listid", *filter.ListID)
+		}
 		if filter.CreatedAfter != nil {
-			params.Add("filters[created_after]", (*filter.CreatedAfter).Format(time.RFC3339))
+			params.Add("filters[created_after]", (*filter.CreatedAfter).Format(TimestampFormat))
+		}
+		if filter.UpdatedAfter != nil {
+			params.Add("filters[updated_after]", (*filter.UpdatedAfter).Format(TimestampFormat))
 		}
 	}
 
@@ -178,4 +188,22 @@ func (service *Service) DeleteContact(contactID string) *errortools.Error {
 	}
 
 	return nil
+}
+
+func (service *Service) GetContactFieldValues(contactID string) (*[]CustomField, *errortools.Error) {
+	fieldValues := struct {
+		FieldValues []CustomField `json:"fieldValues"`
+	}{}
+
+	requestConfig := go_http.RequestConfig{
+		URL:           service.url(fmt.Sprintf("contacts/%s/fieldValues?%s", contactID)),
+		ResponseModel: &fieldValues,
+	}
+
+	_, _, e := service.get(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &fieldValues.FieldValues, nil
 }

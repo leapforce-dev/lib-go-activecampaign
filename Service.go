@@ -3,14 +3,17 @@ package activecampaign
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
 )
 
 const (
-	APIURL string = "https://%s.api-us1.com/api/3"
-	limit  int    = 20
+	APIURL          string = "https://%s.api-us1.com/api/3"
+	limit           int    = 20
+	TimestampFormat string = "2006-01-02 15:04:05"
+	XDateFormat     string = "2006-01-02T15:04:05"
 )
 
 type CustomField struct {
@@ -87,4 +90,14 @@ func (service *Service) put(requestConfig *go_http.RequestConfig) (*http.Request
 
 func (service *Service) delete(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
 	return service.httpRequest(http.MethodDelete, requestConfig)
+}
+
+func ParseXDate(xdate string) (*time.Time, *errortools.Error) {
+
+	t, err := time.Parse(XDateFormat, xdate[:len(XDateFormat)])
+	if err != nil {
+		return nil, errortools.ErrorMessage(err)
+	}
+
+	return &t, nil
 }
