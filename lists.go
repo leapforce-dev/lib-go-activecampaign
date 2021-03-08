@@ -103,7 +103,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 		listsBatch := Lists{}
 
 		requestConfig := go_http.RequestConfig{
-			URL:           service.url("lists"),
+			URL:           service.url(fmt.Sprintf("lists?%s", params.Encode())),
 			ResponseModel: &listsBatch,
 		}
 
