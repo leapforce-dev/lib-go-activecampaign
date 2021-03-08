@@ -2,6 +2,8 @@ package activecampaign
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/url"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
@@ -73,17 +75,49 @@ type ListLinks struct {
 	Sitemessages string `json:"sitemessages"`
 }
 
-func (service *Service) GetLists() (*Lists, *errortools.Error) {
+type GetListsConfig struct {
+	Limit *uint
+	Name  *string
+}
+
+func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *errortools.Error) {
+	params := url.Values{}
+
 	lists := Lists{}
+	offset := uint(0)
+	limit := uint(100)
 
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url("lists"),
-		ResponseModel: &lists,
+	if getListsConfig != nil {
+		if getListsConfig.Name != nil {
+			params.Add("filters[name]", *getListsConfig.Name)
+		}
+		if getListsConfig.Limit != nil {
+			limit = *getListsConfig.Limit
+		}
 	}
+	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		listsBatch := Lists{}
+
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url("lists"),
+			ResponseModel: &listsBatch,
+		}
+
+		_, _, e := service.get(&requestConfig)
+		if e != nil {
+			return nil, e
+		}
+
+		lists.Lists = append(lists.Lists, listsBatch.Lists...)
+
+		if len(listsBatch.Lists) < int(limit) {
+			break
+		}
+		offset += limit
 	}
 
 	return &lists, nil

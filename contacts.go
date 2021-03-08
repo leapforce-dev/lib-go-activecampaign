@@ -75,29 +75,29 @@ type GetContactsConfig struct {
 	UpdatedAfter *time.Time
 }
 
-func (service *Service) GetContacts(filter *GetContactsConfig) (*Contacts, *errortools.Error) {
+func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Contacts, *errortools.Error) {
 	params := url.Values{}
-
-	if filter != nil {
-		if filter.Email != nil {
-			params.Add("email", *filter.Email)
-		}
-		if filter.ListID != nil {
-			params.Add("listid", *filter.ListID)
-		}
-		if filter.CreatedAfter != nil {
-			params.Add("filters[created_after]", (*filter.CreatedAfter).Format(TimestampFormat))
-		}
-		if filter.UpdatedAfter != nil {
-			params.Add("filters[updated_after]", (*filter.UpdatedAfter).Format(TimestampFormat))
-		}
-	}
 
 	contacts := Contacts{}
 	offset := uint(0)
 	limit := uint(100)
-	if filter.Limit != nil {
-		limit = *filter.Limit
+
+	if getContactsConfig != nil {
+		if getContactsConfig.Email != nil {
+			params.Add("email", *getContactsConfig.Email)
+		}
+		if getContactsConfig.ListID != nil {
+			params.Add("listid", *getContactsConfig.ListID)
+		}
+		if getContactsConfig.CreatedAfter != nil {
+			params.Add("filters[created_after]", (*getContactsConfig.CreatedAfter).Format(TimestampFormat))
+		}
+		if getContactsConfig.UpdatedAfter != nil {
+			params.Add("filters[updated_after]", (*getContactsConfig.UpdatedAfter).Format(TimestampFormat))
+		}
+		if getContactsConfig.Limit != nil {
+			limit = *getContactsConfig.Limit
+		}
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
