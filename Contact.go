@@ -5,47 +5,73 @@ import (
 	"net/url"
 	"time"
 
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
 )
 
 type Contacts struct {
 	Contacts []Contact `json:"contacts"`
-	//Meta     FieldValuesMeta `json:"meta"`
+	Meta     Meta      `json:"meta"`
 }
 
 type Contact struct {
-	CreateDate       string       `json:"cdate"`
-	Email            string       `json:"email"`
-	Phone            string       `json:"phone"`
-	FirstName        string       `json:"firstName,omitempty"`
-	LastName         string       `json:"lastName,omitempty"`
-	ID               string       `json:"id"`
-	UpdateDate       string       `json:"udate"`
-	Links            ContactLinks `json:"links"`
-	CreatedTimestamp string       `json:"created_timestamp"`
-	UpdatedTimestamp string       `json:"updated_timestamp"`
+	CreatedDate         a_types.DateTimeTimezoneString  `json:"cdate"`
+	Email               string                          `json:"email"`
+	Phone               *string                         `json:"phone"`
+	FirstName           *string                         `json:"firstName"`
+	LastName            *string                         `json:"lastName"`
+	SegmentIOID         go_types.Int64String            `json:"segmentio_id"`
+	BouncedHard         go_types.Int64String            `json:"bounced_hard"`
+	BouncedSoft         go_types.Int64String            `json:"bounced_soft"`
+	BouncedDate         *a_types.DateString             `json:"bounced_date"`
+	IP                  *string                         `json:"ip"`
+	UA                  *string                         `json:"ua"`
+	Hash                string                          `json:"hash"`
+	SocialdataLastcheck a_types.DateTimeString          `json:"socialdata_lastcheck"`
+	EmailLocal          *string                         `json:"email_local"`
+	EmailDomain         *string                         `json:"email_domain"`
+	SentCount           go_types.Int64String            `json:"sentcnt"`
+	RatingDate          *a_types.DateString             `json:"rating_tstamp"`
+	Gravatar            go_types.Int64String            `json:"gravatar"`
+	Deleted             go_types.BoolString             `json:"deleted"`
+	Anonymized          go_types.BoolString             `json:"anonymized"`
+	ADate               a_types.DateTimeTimezoneString  `json:"adate"`
+	UpdatedDate         a_types.DateTimeTimezoneString  `json:"udate"`
+	EDate               *a_types.DateTimeTimezoneString `json:"edate"`
+	DeletedDate         *a_types.DateTimeString         `json:"deleted_at"`
+	CreatedUTCTimestamp a_types.DateTimeString          `json:"created_utc_timestamp"`
+	UpdatedUTCTimestamp a_types.DateTimeString          `json:"updated_utc_timestamp"`
+	CreatedTimestamp    a_types.DateTimeString          `json:"created_timestamp"`
+	UpdatedTimestamp    a_types.DateTimeString          `json:"updated_timestamp"`
+	CreatedBy           *go_types.Int64String           `json:"created_by"`
+	UpdatedBy           *go_types.Int64String           `json:"updated_by"`
+	EmailEmpty          bool                            `json:"email_empty"`
+	Links               ContactLinks                    `json:"links"`
+	ID                  go_types.Int64String            `json:"id"`
+	Organization        *go_types.Int64String           `json:"organization"`
 }
 
 type ContactLinks struct {
-	BounceLogs            string `json:"bounceLogs"`
-	ContactAutomations    string `json:"contactAutomations"`
-	ContactData           string `json:"contactData"`
-	ContactGoals          string `json:"contactGoals"`
-	ContactLists          string `json:"contactLists"`
-	ContactLogs           string `json:"contactLogs"`
-	ContactTags           string `json:"contactTags"`
-	ContactDeals          string `json:"contactDeals"`
-	Deals                 string `json:"deals"`
-	FieldValues           string `json:"fieldValues"`
-	GeoIps                string `json:"geoIps"`
-	Notes                 string `json:"notes"`
-	Organization          string `json:"organization"`
-	PlusAppend            string `json:"plusAppend"`
-	TrackingLogs          string `json:"trackingLogs"`
-	ScoreValues           string `json:"scoreValues"`
-	AccountContacts       string `json:"accountContacts"`
-	AutomationEntryCounts string `json:"automationEntryCounts"`
+	BounceLogs            *string `json:"bounceLogs"`
+	ContactAutomations    *string `json:"contactAutomations"`
+	ContactData           *string `json:"contactData"`
+	ContactGoals          *string `json:"contactGoals"`
+	ContactLists          *string `json:"contactLists"`
+	ContactLogs           *string `json:"contactLogs"`
+	ContactTags           *string `json:"contactTags"`
+	ContactDeals          *string `json:"contactDeals"`
+	Deals                 *string `json:"deals"`
+	FieldValues           *string `json:"fieldValues"`
+	GeoIPs                *string `json:"geoIps"`
+	Notes                 *string `json:"notes"`
+	Organization          *string `json:"organization"`
+	PlusAppend            *string `json:"plusAppend"`
+	TrackingLogs          *string `json:"trackingLogs"`
+	ScoreValues           *string `json:"scoreValues"`
+	AccountContacts       *string `json:"accountContacts"`
+	AutomationEntryCounts *string `json:"automationEntryCounts"`
 }
 
 type ContactSync struct {
@@ -110,6 +136,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			URL:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
 			ResponseModel: &contactsBatch,
 		}
+		fmt.Println(service.url(fmt.Sprintf("contacts?%s", params.Encode())))
 
 		_, _, e := service.get(&requestConfig)
 		if e != nil {

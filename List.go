@@ -95,7 +95,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 			limit = *getListsConfig.Limit
 		}
 	}
-	params.Add("limit", fmt.Sprintf("%v", limit))
+	params.Set("limit", fmt.Sprintf("%v", limit))
 
 	for true {
 		params.Set("offset", fmt.Sprintf("%v", offset))

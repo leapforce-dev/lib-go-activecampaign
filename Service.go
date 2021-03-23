@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	APIURL          string = "https://%s.api-us1.com/api/3"
 	limit           int    = 20
 	TimestampFormat string = "2006-01-02 15:04:05"
 	XDateFormat     string = "2006-01-02T15:04:05"
@@ -22,29 +21,34 @@ type CustomField struct {
 }
 
 type Service struct {
-	accountName string
+	host        string
 	apiKey      string
 	httpService *go_http.Service
 }
 
 type ServiceConfig struct {
-	AccountName string
-	APIKey      string
+	Host   string
+	APIKey string
 }
 
 func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
-	if serviceConfig.AccountName == "" {
-		return nil, errortools.ErrorMessage("AccountName not provided")
+	if serviceConfig.Host == "" {
+		return nil, errortools.ErrorMessage("Host not provided")
 	}
 
 	if serviceConfig.APIKey == "" {
 		return nil, errortools.ErrorMessage("APIKey not provided")
 	}
 
+	httpService, e := go_http.NewService(&go_http.ServiceConfig{})
+	if e != nil {
+		return nil, e
+	}
+
 	return &Service{
-		accountName: serviceConfig.AccountName,
+		host:        serviceConfig.Host,
 		apiKey:      serviceConfig.APIKey,
-		httpService: go_http.NewService(go_http.ServiceConfig{}),
+		httpService: httpService,
 	}, nil
 }
 
@@ -63,7 +67,7 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 		e.SetMessage(errorResponse.Errors[0].Title)
 	}
 
-	// activecampaign sometimes returns an error while the actions has succesfully been performed
+	// activecampaign sometimes returns an error while the action has succesfully been performed
 	if response.StatusCode >= 200 && response.StatusCode <= 299 {
 		errortools.CaptureError(e)
 		return request, response, nil
@@ -73,7 +77,7 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 }
 
 func (service *Service) url(path string) string {
-	return fmt.Sprintf("%s/%s", fmt.Sprintf(APIURL, service.accountName), path)
+	return fmt.Sprintf("https://%s/api/3/%s", service.host, path)
 }
 
 func (service *Service) get(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
