@@ -1,27 +1,29 @@
 package activecampaign
 
 import (
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
 )
 
 type Automations struct {
 	Automations []Automation `json:"automations"`
-	//Meta     FieldValuesMeta `json:"meta"`
+	Meta        Meta         `json:"meta"`
 }
 
 type Automation struct {
-	Name              string          `json:"name"`
-	CreateDate        string          `json:"cdate"`
-	ModifiedDate      string          `json:"mdate"`
-	UserID            string          `json:"userid"`
-	Status            string          `json:"status"`
-	Entered           string          `json:"entered"`
-	Exited            string          `json:"exited"`
-	Hidden            string          `json:"hidden"`
-	DefaultScreenshot string          `json:"defaultscreenshot"`
-	ID                string          `json:"id"`
-	Links             AutomationLinks `json:"links"`
+	Name              string                         `json:"name"`
+	CreatedDate       a_types.DateTimeTimezoneString `json:"cdate"`
+	ModifiedDate      a_types.DateTimeTimezoneString `json:"mdate"`
+	UserID            go_types.Int64String           `json:"userid"`
+	Status            go_types.Int64String           `json:"status"`
+	Entered           go_types.Int64String           `json:"entered"`
+	Exited            go_types.Int64String           `json:"exited"`
+	Hidden            go_types.Int64String           `json:"hidden"`
+	DefaultScreenshot *string                        `json:"defaultscreenshot"`
+	ID                go_types.Int64String           `json:"id"`
+	Links             AutomationLinks                `json:"links"`
 }
 
 type AutomationLinks struct {
@@ -32,10 +34,6 @@ type AutomationLinks struct {
 	Goals              string `json:"goals"`
 	SMS                string `json:"sms"`
 	Sitemessages       string `json:"sitemessages"`
-}
-
-type GetAutomationsFilter struct {
-	Email *string
 }
 
 func (service *Service) GetAutomations() (*Automations, *errortools.Error) {

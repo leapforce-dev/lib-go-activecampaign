@@ -136,7 +136,6 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			URL:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
 			ResponseModel: &contactsBatch,
 		}
-		fmt.Println(service.url(fmt.Sprintf("contacts?%s", params.Encode())))
 
 		_, _, e := service.get(&requestConfig)
 		if e != nil {
