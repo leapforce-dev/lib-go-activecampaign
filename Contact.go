@@ -217,13 +217,13 @@ func (service *Service) DeleteContact(contactID string) *errortools.Error {
 	return nil
 }
 
-func (service *Service) GetContactFieldValues(contactID string) (*[]CustomField, *errortools.Error) {
+func (service *Service) GetContactFieldValues(contactID int64) (*[]CustomField, *errortools.Error) {
 	fieldValues := struct {
 		FieldValues []CustomField `json:"fieldValues"`
 	}{}
 
 	requestConfig := go_http.RequestConfig{
-		URL:           service.url(fmt.Sprintf("contacts/%s/fieldValues?%s", contactID)),
+		URL:           service.url(fmt.Sprintf("contacts/%v/fieldValues", contactID)),
 		ResponseModel: &fieldValues,
 	}
 
