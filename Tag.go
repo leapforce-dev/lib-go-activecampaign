@@ -26,14 +26,11 @@ type Tag struct {
 	CreatedBy        *go_types.Int64String          `json:"created_by"`
 	UpdatedBy        *go_types.Int64String          `json:"updated_by"`
 	ID               go_types.Int64String           `json:"id"`
-	Links            TagLinks                       `json:"links"`
-}
-
-type TagLinks struct {
-	ContactGoalTags string `json:"contactGoalTags"`
+	Links            *Links                         `json:"links"`
 }
 
 type GetTagsConfig struct {
+	Limit  *uint
 	Search *string
 }
 
@@ -41,21 +38,41 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 	params := url.Values{}
 
 	tags := Tags{}
+	offset := uint(0)
+	limit := defaultLimit
 
 	if getTagsConfig != nil {
 		if getTagsConfig.Search != nil {
 			params.Add("search", *getTagsConfig.Search)
 		}
+		if getTagsConfig.Limit != nil {
+			limit = *getTagsConfig.Limit
+		}
 	}
 
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url(fmt.Sprintf("tags?%s", params.Encode())),
-		ResponseModel: &tags,
-	}
+	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		tagsBatch := Tags{}
+
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("tags?%s", params.Encode())),
+			ResponseModel: &tagsBatch,
+		}
+
+		_, _, e := service.get(&requestConfig)
+		if e != nil {
+			return nil, e
+		}
+
+		tags.Tags = append(tags.Tags, tagsBatch.Tags...)
+
+		if len(tagsBatch.Tags) < int(limit) {
+			break
+		}
+		offset += limit
 	}
 
 	return &tags, nil

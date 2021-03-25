@@ -1,6 +1,9 @@
 package activecampaign
 
 import (
+	"fmt"
+	"net/url"
+
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
@@ -23,30 +26,49 @@ type Automation struct {
 	Hidden            go_types.Int64String           `json:"hidden"`
 	DefaultScreenshot *string                        `json:"defaultscreenshot"`
 	ID                go_types.Int64String           `json:"id"`
-	Links             AutomationLinks                `json:"links"`
+	Links             *Links                         `json:"links"`
 }
 
-type AutomationLinks struct {
-	Campaigns          string `json:"campaigns"`
-	ContactGoals       string `json:"contactGoals"`
-	ContactAutomations string `json:"contactAutomations"`
-	Blocks             string `json:"blocks"`
-	Goals              string `json:"goals"`
-	SMS                string `json:"sms"`
-	Sitemessages       string `json:"sitemessages"`
+type GetAutomationsConfig struct {
+	Limit *uint
 }
 
-func (service *Service) GetAutomations() (*Automations, *errortools.Error) {
+func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfig) (*Automations, *errortools.Error) {
+	params := url.Values{}
+
 	automations := Automations{}
+	offset := uint(0)
+	limit := defaultLimit
 
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url("automations"),
-		ResponseModel: &automations,
+	if getAutomationsConfig != nil {
+		if getAutomationsConfig.Limit != nil {
+			limit = *getAutomationsConfig.Limit
+		}
 	}
 
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
+	params.Add("limit", fmt.Sprintf("%v", limit))
+
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		automationsBatch := Automations{}
+
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("automations?%s", params.Encode())),
+			ResponseModel: &automationsBatch,
+		}
+
+		_, _, e := service.get(&requestConfig)
+		if e != nil {
+			return nil, e
+		}
+
+		automations.Automations = append(automations.Automations, automationsBatch.Automations...)
+
+		if len(automationsBatch.Automations) < int(limit) {
+			break
+		}
+		offset += limit
 	}
 
 	return &automations, nil

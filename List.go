@@ -62,19 +62,9 @@ type List struct {
 	UpdatedTimestamp     a_types.DateTimeString         `json:"updated_timestamp"`
 	CreatedBy            *go_types.Int64String          `json:"created_by"`
 	UpdatedBy            *go_types.Int64String          `json:"updated_by"`
-	Links                ListLinks                      `json:"links"`
+	Links                *Links                         `json:"links"`
 	ID                   go_types.Int64String           `json:"id"`
 	User                 go_types.Int64String           `json:"user"`
-}
-
-type ListLinks struct {
-	Campaigns    string `json:"contactGoalLists"`
-	ContactGoals string `json:"user"`
-	ContactLists string `json:"addressLists"`
-	Blocks       string `json:"blocks"`
-	Goals        string `json:"goals"`
-	SMS          string `json:"sms"`
-	Sitemessages string `json:"sitemessages"`
 }
 
 type GetListsConfig struct {
@@ -87,7 +77,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 
 	lists := Lists{}
 	offset := uint(0)
-	limit := uint(100)
+	limit := defaultLimit
 
 	if getListsConfig != nil {
 		if getListsConfig.Name != nil {

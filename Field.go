@@ -2,48 +2,61 @@ package activecampaign
 
 import (
 	"fmt"
-	"strconv"
+	"net/url"
 
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
 )
 
 type Fields struct {
-	FieldOptions   interface{}     `json:"fieldOptions"`
+	FieldOptions   []FieldOption   `json:"fieldOptions"`
 	FieldRelations []FieldRelation `json:"fieldRels"`
 	Fields         []Field         `json:"fields"`
-	Meta           FieldsMeta      `json:"meta"`
+	Meta           Meta            `json:"meta"`
 }
 
-type FieldsMeta struct {
-	Total string `json:"total"`
+type FieldOption struct {
+	FieldID     go_types.Int64String           `json:"field"`
+	OrderID     go_types.Int64String           `json:"orderid"`
+	Value       string                         `json:"value"`
+	Label       string                         `json:"label"`
+	IsDefault   go_types.BoolString            `json:"isdefault"`
+	CreatedDate a_types.DateTimeTimezoneString `json:"cdate"`
+	UpdatedDate a_types.DateTimeTimezoneString `json:"udate"`
+	Links       *Links                         `json:"links"`
+	ID          go_types.Int64String           `json:"id"`
 }
 
 type FieldRelation struct {
-	Field      string `json:"field"`
-	RelationID string `json:"relid"`
-	DOrder     string `json:"dorder"`
-	CreateDate string `json:"cdate"`
-	//Links      interface{} `json:"links"`
-	ID string `json:"id"`
+	FieldID      go_types.Int64String           `json:"field"`
+	RelationID   go_types.Int64String           `json:"relid"`
+	DisplayOrder go_types.Int64String           `json:"dorder"`
+	CreatedDate  a_types.DateTimeTimezoneString `json:"cdate"`
+	Links        *Links                         `json:"links"`
+	ID           go_types.Int64String           `json:"id"`
 }
 
 type Field struct {
-	Title        string `json:"title"`
-	Description  string `json:"descript"`
-	Type         string `json:"type"`
-	IsRequired   string `json:"isrequired"`
-	Perstag      string `json:"perstag"`
-	DefaultValue string `json:"defval"`
-	Visible      string `json:"visible"`
-	Service      string `json:"service"`
-	Ordernum     string `json:"ordernum"`
-	CreateDate   string `json:"cdate"`
-	UpdateDate   string `json:"udate"`
-	//Options      interface{}    `json:"options"`
-	Relations []string  `json:"relations"`
-	Links     FieldLink `json:"links"`
-	ID        string    `json:"id"`
+	Title              string                         `json:"title"`
+	Description        string                         `json:"descript"`
+	Type               string                         `json:"type"`
+	IsRequired         go_types.BoolString            `json:"isrequired"`
+	PersonalizationTag string                         `json:"perstag"`
+	DefaultValue       string                         `json:"defval"`
+	ShowInList         go_types.BoolString            `json:"show_in_list"`
+	Rows               go_types.Int64String           `json:"rows"`
+	Columns            go_types.Int64String           `json:"cols"`
+	Visible            go_types.BoolString            `json:"visible"`
+	Service            string                         `json:"service"`
+	OrderNumber        go_types.Int64String           `json:"ordernum"`
+	CreatedDate        a_types.DateTimeTimezoneString `json:"cdate"`
+	UpdatedDate        a_types.DateTimeTimezoneString `json:"udate"`
+	Options            []go_types.Int64String         `json:"options"`
+	Relations          []go_types.Int64String         `json:"relations"`
+	Links              *Links                         `json:"links"`
+	ID                 go_types.Int64String           `json:"id"`
 }
 
 type FieldUpdate struct {
@@ -63,17 +76,33 @@ type FieldLink struct {
 	Relations string `json:"Relations"`
 }
 
-func (service *Service) GetCustomFields() (*Fields, *errortools.Error) {
-	rowCount := 0
+type GetFieldsConfig struct {
+	Limit *uint
+}
+
+func (service *Service) GetFields(getFieldsConfig *GetFieldsConfig) (*Fields, *errortools.Error) {
+	params := url.Values{}
 
 	fields := Fields{}
+	offset := uint(0)
+	limit := defaultLimit
+
+	if getFieldsConfig != nil {
+		if getFieldsConfig.Limit != nil {
+			limit = *getFieldsConfig.Limit
+		}
+	}
+
+	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		fields_ := Fields{}
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		fieldsBatch := Fields{}
 
 		requestConfig := go_http.RequestConfig{
-			URL:           service.url(fmt.Sprintf("fields?limit=%v&offset=%v", limit, rowCount)),
-			ResponseModel: &fields_,
+			URL:           service.url(fmt.Sprintf("fields?%s", params.Encode())),
+			ResponseModel: &fieldsBatch,
 		}
 
 		_, _, e := service.get(&requestConfig)
@@ -81,17 +110,12 @@ func (service *Service) GetCustomFields() (*Fields, *errortools.Error) {
 			return nil, e
 		}
 
-		fields.Fields = append(fields.Fields, fields_.Fields...)
-		rowCount += len(fields_.Fields)
+		fields.Fields = append(fields.Fields, fieldsBatch.Fields...)
 
-		total, err := strconv.Atoi(fields_.Meta.Total)
-		if err != nil {
-			return nil, errortools.ErrorMessage(err)
-		}
-
-		if rowCount >= total {
+		if len(fieldsBatch.Fields) < int(limit) {
 			break
 		}
+		offset += limit
 	}
 
 	return &fields, nil

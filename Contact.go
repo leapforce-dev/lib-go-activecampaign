@@ -3,6 +3,7 @@ package activecampaign
 import (
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
@@ -12,8 +13,10 @@ import (
 )
 
 type Contacts struct {
-	Contacts []Contact `json:"contacts"`
-	Meta     Meta      `json:"meta"`
+	ContactLists *[]ContactList `json:"contactLists"`
+	FieldValues  *[]FieldValue  `json:"fieldValues"`
+	Contacts     []Contact      `json:"contacts"`
+	Meta         Meta           `json:"meta"`
 }
 
 type Contact struct {
@@ -48,30 +51,15 @@ type Contact struct {
 	CreatedBy           *go_types.Int64String           `json:"created_by"`
 	UpdatedBy           *go_types.Int64String           `json:"updated_by"`
 	EmailEmpty          bool                            `json:"email_empty"`
-	Links               ContactLinks                    `json:"links"`
+	ScoreValues         *go_types.Int64Strings          `json:"scoreValues"`
+	AccountContacts     *go_types.Int64Strings          `json:"accountContacts"`
+	ContactListIDs      *go_types.Int64Strings          `json:"contactLists"`
+	FieldValueIDs       *go_types.Int64Strings          `json:"fieldValues"`
+	Links               *Links                          `json:"links"`
 	ID                  go_types.Int64String            `json:"id"`
 	Organization        *go_types.Int64String           `json:"organization"`
-}
-
-type ContactLinks struct {
-	BounceLogs            *string `json:"bounceLogs"`
-	ContactAutomations    *string `json:"contactAutomations"`
-	ContactData           *string `json:"contactData"`
-	ContactGoals          *string `json:"contactGoals"`
-	ContactLists          *string `json:"contactLists"`
-	ContactLogs           *string `json:"contactLogs"`
-	ContactTags           *string `json:"contactTags"`
-	ContactDeals          *string `json:"contactDeals"`
-	Deals                 *string `json:"deals"`
-	FieldValues           *string `json:"fieldValues"`
-	GeoIPs                *string `json:"geoIps"`
-	Notes                 *string `json:"notes"`
-	Organization          *string `json:"organization"`
-	PlusAppend            *string `json:"plusAppend"`
-	TrackingLogs          *string `json:"trackingLogs"`
-	ScoreValues           *string `json:"scoreValues"`
-	AccountContacts       *string `json:"accountContacts"`
-	AutomationEntryCounts *string `json:"automationEntryCounts"`
+	ContactLists        *[]ContactList                  `json:"-"`
+	FieldValues         *[]FieldValue                   `json:"-"`
 }
 
 type ContactSync struct {
@@ -83,15 +71,22 @@ type ContactSync struct {
 }
 
 type ContactSynced struct {
-	Email      string       `json:"email"`
-	FirstName  string       `json:"firstName"`
-	LastName   string       `json:"lastName"`
-	Phone      string       `json:"phone"`
-	CreateDate string       `json:"cdate"`
-	UpdateDate string       `json:"udate"`
-	Links      ContactLinks `json:"links"`
-	ID         string       `json:"id"`
+	Email      string            `json:"email"`
+	FirstName  string            `json:"firstName"`
+	LastName   string            `json:"lastName"`
+	Phone      string            `json:"phone"`
+	CreateDate string            `json:"cdate"`
+	UpdateDate string            `json:"udate"`
+	Links      map[string]string `json:"links"`
+	ID         string            `json:"id"`
 }
+
+type ContactInclude string
+
+const (
+	ContactIncludeFieldValues  ContactInclude = "fieldValues"
+	ContactIncludeContactLists ContactInclude = "contactLists"
+)
 
 type GetContactsConfig struct {
 	Limit        *uint
@@ -99,6 +94,7 @@ type GetContactsConfig struct {
 	ListID       *string
 	CreatedAfter *time.Time
 	UpdatedAfter *time.Time
+	Include      *[]ContactInclude
 }
 
 func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Contacts, *errortools.Error) {
@@ -106,9 +102,12 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 
 	contacts := Contacts{}
 	offset := uint(0)
-	limit := uint(100)
+	limit := defaultLimit
 
 	if getContactsConfig != nil {
+		if getContactsConfig.Limit != nil {
+			limit = *getContactsConfig.Limit
+		}
 		if getContactsConfig.Email != nil {
 			params.Add("email", *getContactsConfig.Email)
 		}
@@ -121,8 +120,13 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		if getContactsConfig.UpdatedAfter != nil {
 			params.Add("filters[updated_after]", (*getContactsConfig.UpdatedAfter).Format(TimestampFormat))
 		}
-		if getContactsConfig.Limit != nil {
-			limit = *getContactsConfig.Limit
+		if getContactsConfig.Include != nil {
+			includes := []string{}
+			for _, include := range *getContactsConfig.Include {
+				includes = append(includes, string(include))
+			}
+
+			params.Add("include", strings.Join(includes, ","))
 		}
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
@@ -142,6 +146,28 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			return nil, e
 		}
 
+		if contactsBatch.ContactLists != nil {
+			for i, contact := range contactsBatch.Contacts {
+				var contactLists []ContactList
+				for _, contactList := range *contactsBatch.ContactLists {
+					if contact.ID == contactList.ContactID {
+						contactLists = append(contactLists, contactList)
+					}
+				}
+				contactsBatch.Contacts[i].ContactLists = &contactLists
+			}
+		}
+		if contactsBatch.FieldValues != nil {
+			for i, contact := range contactsBatch.Contacts {
+				var fieldValues []FieldValue
+				for _, fieldValue := range *contactsBatch.FieldValues {
+					if contact.ID == fieldValue.ContactID {
+						fieldValues = append(fieldValues, fieldValue)
+					}
+				}
+				contactsBatch.Contacts[i].FieldValues = &fieldValues
+			}
+		}
 		contacts.Contacts = append(contacts.Contacts, contactsBatch.Contacts...)
 
 		if len(contactsBatch.Contacts) < int(limit) {

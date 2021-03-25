@@ -1,88 +1,55 @@
 package activecampaign
 
 import (
-	"encoding/json"
-	"fmt"
-
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
 )
 
-type ContactLists struct {
-	ContactLists []ContactList `json:"contactLists"`
-	//Meta     FieldValuesMeta `json:"meta"`
-}
-
 type ContactList struct {
-	ID                    string           `json:"id"`
-	Automation            string           `json:"automation"`
-	Contact               string           `json:"contact"`
-	List                  string           `json:"list"`
-	Form                  json.RawMessage  `json:"form"`
-	SeriesID              string           `json:"seriesid"`
-	SubscribeDate         string           `json:"sdate"`
-	UnsubscribeDate       string           `json:"udate"`
-	Status                string           `json:"status"`
-	Responder             string           `json:"responder"`
-	Sync                  string           `json:"sync"`
-	UnsubscribeReason     string           `json:"unsubreason"`
-	Campaign              string           `json:"campaign"`
-	Message               string           `json:"message"`
-	FirstName             string           `json:"first_name"`
-	LastName              string           `json:"last_name"`
-	IPSubcribe            string           `json:"ip4sub"`
-	SourceID              string           `json:"sourceid"`
-	AutosyncLog           json.RawMessage  `json:"autosyncLog"`
-	IPLast                string           `json:"ip4_last"`
-	IPUnsubscribe         string           `json:"ip4Unsub"`
-	CreatedTimestamp      string           `json:"created_timestamp"`
-	UpdatedTimestamp      string           `json:"updated_timestamp"`
-	CreatedBy             string           `json:"created_by"`
-	UpdatedBy             string           `json:"updated_by"`
-	UnsubscribeAutomation string           `json:"unsubscribeAutomation"`
-	Links                 ContactListLinks `json:"links"`
+	ContactID               go_types.Int64String            `json:"contact"`
+	ListID                  go_types.Int64String            `json:"list"`
+	FormID                  *go_types.Int64String           `json:"form"`
+	SeriesID                *go_types.Int64String           `json:"seriesid"`
+	SubscribedDate          a_types.DateTimeTimezoneString  `json:"sdate"`
+	UnsubscribedDate        *a_types.DateTimeTimezoneString `json:"udate"`
+	Status                  go_types.Int64String            `json:"status"`
+	Responder               go_types.BoolString             `json:"responder"`
+	Sync                    go_types.Int64String            `json:"sync"`
+	UnsubscribeReason       *go_types.String                `json:"unsubreason"`
+	CampaignID              *go_types.Int64String           `json:"campaign"`
+	MessageID               *go_types.Int64String           `json:"message"`
+	FirstName               *go_types.String                `json:"first_name"`
+	LastName                *go_types.String                `json:"last_name"`
+	IPSubcribe              *go_types.String                `json:"ip4sub"`
+	SourceID                *go_types.Int64String           `json:"sourceid"`
+	AutosyncLog             *go_types.String                `json:"autosyncLog"`
+	IPLast                  *go_types.Int64String           `json:"ip4_last"`
+	IPUnsubscribe           *go_types.Int64String           `json:"ip4Unsub"`
+	CreatedTimestamp        a_types.DateTimeString          `json:"created_timestamp"`
+	UpdatedTimestamp        a_types.DateTimeString          `json:"updated_timestamp"`
+	CreatedBy               *go_types.String                `json:"created_by"`
+	UpdatedBy               *go_types.String                `json:"updated_by"`
+	UnsubscribeAutomationID *go_types.Int64String           `json:"unsubscribeAutomation"`
+	Links                   Links                           `json:"links"`
+	ID                      go_types.Int64String            `json:"id"`
+	AutomationID            *go_types.Int64String           `json:"automation"`
 }
 
-type ContactListLinks struct {
-	Automation            string `json:"automation"`
-	List                  string `json:"list"`
-	Contact               string `json:"contact"`
-	Form                  string `json:"form"`
-	AutosyncLog           string `json:"autosyncLog"`
-	Campaign              string `json:"campaign"`
-	UnsubscribeAutomation string `json:"unsubscribeAutomation"`
-	Message               string `json:"message"`
-}
-
-func (service *Service) GetContactLists(contactID string) (*ContactLists, *errortools.Error) {
-	contactLists := ContactLists{}
-
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url(fmt.Sprintf("contacts/%s/contactAutomations", contactID)),
-		ResponseModel: &contactLists,
-	}
-
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
-	}
-
-	return &contactLists, nil
-}
-
-func (service *Service) Subscribe(contactID int, listID int) *errortools.Error {
+func (service *Service) Subscribe(contactID int64, listID int64) *errortools.Error {
 	return service.setContactLists(contactID, listID, 1)
 }
 
-func (service *Service) Unsubscribe(contactID int, listID int) *errortools.Error {
+func (service *Service) Unsubscribe(contactID int64, listID int64) *errortools.Error {
 	return service.setContactLists(contactID, listID, 2)
 }
 
-func (service *Service) setContactLists(listID int, contactID int, status int) *errortools.Error {
+func (service *Service) setContactLists(listID int64, contactID int64, status int64) *errortools.Error {
 	type contactList struct {
-		List    int `json:"list"`
-		Contact int `json:"contact"`
-		Status  int `json:"status"`
+		ListID    int64 `json:"list"`
+		ContactID int64 `json:"contact"`
+		Status    int64 `json:"status"`
 	}
 
 	type data struct {
@@ -91,9 +58,9 @@ func (service *Service) setContactLists(listID int, contactID int, status int) *
 
 	d := data{
 		contactList{
-			List:    listID,
-			Contact: contactID,
-			Status:  status,
+			ListID:    listID,
+			ContactID: contactID,
+			Status:    status,
 		},
 	}
 

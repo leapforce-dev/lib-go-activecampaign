@@ -6,8 +6,8 @@ import (
 
 type Meta struct {
 	Total     go_types.Int64String `json:"total"`
-	Sortable  bool                 `json:"sortable"`
-	PageInput struct {
+	Sortable  *bool                `json:"sortable"`
+	PageInput *struct {
 		SegmentID  int64            `json:"segmentid"`
 		FormID     int64            `json:"formid"`
 		ListID     int64            `json:"listid"`
