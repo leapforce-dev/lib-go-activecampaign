@@ -13,10 +13,10 @@ import (
 )
 
 type Contacts struct {
-	ContactLists *[]ContactList `json:"contactLists"`
-	FieldValues  *[]FieldValue  `json:"fieldValues"`
-	Contacts     []Contact      `json:"contacts"`
-	Meta         Meta           `json:"meta"`
+	ContactLists *[]ContactList       `json:"contactLists"`
+	FieldValues  *[]FieldValueContact `json:"fieldValues"`
+	Contacts     []Contact            `json:"contacts"`
+	Meta         Meta                 `json:"meta"`
 }
 
 type Contact struct {
@@ -59,7 +59,7 @@ type Contact struct {
 	ID                  go_types.Int64String            `json:"id"`
 	Organization        *go_types.Int64String           `json:"organization"`
 	ContactLists        *[]ContactList                  `json:"-"`
-	FieldValues         *[]FieldValue                   `json:"-"`
+	FieldValues         *[]FieldValueContact            `json:"-"`
 }
 
 type ContactSync struct {
@@ -159,7 +159,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		}
 		if contactsBatch.FieldValues != nil {
 			for i, contact := range contactsBatch.Contacts {
-				var fieldValues []FieldValue
+				var fieldValues []FieldValueContact
 				for _, fieldValue := range *contactsBatch.FieldValues {
 					if contact.ID == fieldValue.ContactID {
 						fieldValues = append(fieldValues, fieldValue)

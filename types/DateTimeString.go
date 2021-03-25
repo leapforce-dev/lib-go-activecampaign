@@ -2,6 +2,7 @@ package facebook
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -16,6 +17,7 @@ func (d *DateTimeString) UnmarshalJSON(b []byte) error {
 
 	err := json.Unmarshal(b, &s)
 	if err != nil {
+		fmt.Println("DateTimeString", string(b))
 		return err
 	}
 

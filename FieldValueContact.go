@@ -9,12 +9,12 @@ import (
 	go_types "github.com/leapforce-libraries/go_types"
 )
 
-type FieldValues struct {
-	FieldValues []FieldValue `json:"fieldValues"`
-	Meta        Meta         `json:"meta"`
+type FieldValuesContact struct {
+	FieldValues []FieldValueContact `json:"fieldValues"`
+	Meta        Meta                `json:"meta"`
 }
 
-type FieldValue struct {
+type FieldValueContact struct {
 	ContactID   go_types.Int64String           `json:"contact"`
 	FieldID     go_types.Int64String           `json:"field"`
 	Value       string                         `json:"value"`
@@ -27,8 +27,8 @@ type FieldValue struct {
 	Links       Links                          `json:"links"`
 }
 
-func (service *Service) GetFieldValues(contactID int64) (*FieldValues, *errortools.Error) {
-	fieldValues := FieldValues{}
+func (service *Service) GetFieldValues(contactID int64) (*FieldValuesContact, *errortools.Error) {
+	fieldValues := FieldValuesContact{}
 
 	requestConfig := go_http.RequestConfig{
 		URL:           service.url(fmt.Sprintf("contacts/%v/fieldValues", contactID)),
