@@ -36,11 +36,10 @@ type Message struct {
 	HTMLFetch     string                         `json:"htmlfetch"`
 	TextFetch     string                         `json:"textfetch"`
 	Hidden        go_types.BoolString            `json:"hidden"`
-	PreviewMime   *string                        `json:"preview_mime"`
-	PreviewData   *string                        `json:"preview_data"`
+	PreviewMime   *go_types.String               `json:"preview_mime"`
+	PreviewData   *go_types.String               `json:"preview_data"`
 	Links         *Links                         `json:"links"`
 	ID            go_types.Int64String           `json:"id"`
-	User          go_types.Int64String           `json:"user"`
 }
 
 type GetMessagesConfig struct {

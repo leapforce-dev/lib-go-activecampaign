@@ -9,5 +9,5 @@ type ContactTag struct {
 	CreatedBy        string `json:"created_by"`
 	UpdatedBy        string `json:"updated_by"`
 	ID               string `json:"id"`
-	Links            Links  `json:"links"`
+	Links            *Links `json:"links"`
 }

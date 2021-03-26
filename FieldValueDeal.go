@@ -23,7 +23,7 @@ type FieldValueDeal struct {
 	UpdatedTimestamp     a_types.DateTimeString  `json:"updated_timestamp"`
 	CreatedBy            *go_types.String        `json:"created_by"`
 	UpdatedBy            *go_types.String        `json:"updated_by"`
-	Links                Links                   `json:"links"`
+	Links                *Links                  `json:"links"`
 	ID                   go_types.Int64String    `json:"id"`
 	DealCustomFieldMetum go_types.Int64String    `json:"dealCustomFieldMetum"`
 }

@@ -32,7 +32,7 @@ type ContactList struct {
 	CreatedBy               *go_types.String                `json:"created_by"`
 	UpdatedBy               *go_types.String                `json:"updated_by"`
 	UnsubscribeAutomationID *go_types.Int64String           `json:"unsubscribeAutomation"`
-	Links                   Links                           `json:"links"`
+	Links                   *Links                          `json:"links"`
 	ID                      go_types.Int64String            `json:"id"`
 	AutomationID            *go_types.Int64String           `json:"automation"`
 }

@@ -14,12 +14,12 @@ type Meta struct {
 		TagID      int64            `json:"tagid"`
 		Limit      int64            `json:"limit"`
 		Offset     int64            `json:"offset"`
-		Search     *string          `json:"search"`
-		Sort       *string          `json:"sort"`
+		Search     *go_types.String `json:"search"`
+		Sort       *go_types.String `json:"sort"`
 		SeriesID   int64            `json:"seriesid"`
 		WaitID     int64            `json:"waitid"`
 		Status     int64            `json:"status"`
 		ForceQuery go_types.BoolInt `json:"forceQuery"`
-		CacheID    *string          `json:"cacheid"`
+		CacheID    *go_types.String `json:"cacheid"`
 	} `json:"page_input"`
 }

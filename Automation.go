@@ -24,7 +24,7 @@ type Automation struct {
 	Entered           go_types.Int64String           `json:"entered"`
 	Exited            go_types.Int64String           `json:"exited"`
 	Hidden            go_types.Int64String           `json:"hidden"`
-	DefaultScreenshot *string                        `json:"defaultscreenshot"`
+	DefaultScreenshot *go_types.String               `json:"defaultscreenshot"`
 	ID                go_types.Int64String           `json:"id"`
 	Links             *Links                         `json:"links"`
 }

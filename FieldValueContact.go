@@ -24,7 +24,7 @@ type FieldValueContact struct {
 	UpdatedBy   *go_types.String               `json:"updated_by"`
 	ID          go_types.Int64String           `json:"id"`
 	OwnerID     go_types.Int64String           `json:"owner"`
-	Links       Links                          `json:"links"`
+	Links       *Links                         `json:"links"`
 }
 
 func (service *Service) GetFieldValues(contactID int64) (*FieldValuesContact, *errortools.Error) {

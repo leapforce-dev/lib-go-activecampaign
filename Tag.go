@@ -18,7 +18,7 @@ type Tags struct {
 type Tag struct {
 	TagType          string                         `json:"tagType"`
 	Tag              string                         `json:"tag"`
-	Description      *string                        `json:"description"`
+	Description      *go_types.String               `json:"description"`
 	SubscriberCount  go_types.Int64String           `json:"subscriber_count"`
 	CreatedDate      a_types.DateTimeTimezoneString `json:"cdate"`
 	CreatedTimestamp a_types.DateTimeString         `json:"created_timestamp"`

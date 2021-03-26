@@ -31,29 +31,29 @@ type List struct {
 	SendLastBroadcast    go_types.BoolString            `json:"send_last_broadcast"`
 	Private              go_types.BoolString            `json:"private"`
 	AnalyticsDomains     json.RawMessage                `json:"analytics_domains"`
-	AnalyticsSource      *string                        `json:"analytics_source"`
-	AnalyticsUA          *string                        `json:"analytics_ua"`
-	TwitterToken         *string                        `json:"twitter_token"`
-	TwitterTokenSecret   *string                        `json:"twitter_token_secret"`
+	AnalyticsSource      *go_types.String               `json:"analytics_source"`
+	AnalyticsUA          *go_types.String               `json:"analytics_ua"`
+	TwitterToken         *go_types.String               `json:"twitter_token"`
+	TwitterTokenSecret   *go_types.String               `json:"twitter_token_secret"`
 	FacebookSession      json.RawMessage                `json:"facebook_session"`
 	CarbonCopy           json.RawMessage                `json:"carboncopy"`
 	SubscriptionNotify   json.RawMessage                `json:"subscription_notify"`
 	UnsubscriptionNotify json.RawMessage                `json:"unsubscription_notify"`
 	RequireName          go_types.BoolString            `json:"require_name"`
 	GetUnsubscribeReason go_types.Int64String           `json:"get_unsubscribe_reason"`
-	ToName               *string                        `json:"to_name"`
+	ToName               *go_types.String               `json:"to_name"`
 	OptInOptOut          go_types.BoolString            `json:"optinoptout"`
-	SenderName           *string                        `json:"sender_name"`
-	SenderAddr1          *string                        `json:"sender_addr1"`
-	SenderAddr2          *string                        `json:"sender_addr2"`
-	SenderCity           *string                        `json:"sender_city"`
-	SenderState          *string                        `json:"sender_state"`
-	SenderZip            *string                        `json:"sender_zip"`
-	SenderCountry        *string                        `json:"sender_country"`
-	SenderPhone          *string                        `json:"sender_phone"`
-	SenderURL            *string                        `json:"sender_url"`
-	SenderReminder       *string                        `json:"sender_reminder"`
-	FullAddress          *string                        `json:"fulladdress"`
+	SenderName           *go_types.String               `json:"sender_name"`
+	SenderAddr1          *go_types.String               `json:"sender_addr1"`
+	SenderAddr2          *go_types.String               `json:"sender_addr2"`
+	SenderCity           *go_types.String               `json:"sender_city"`
+	SenderState          *go_types.String               `json:"sender_state"`
+	SenderZip            *go_types.String               `json:"sender_zip"`
+	SenderCountry        *go_types.String               `json:"sender_country"`
+	SenderPhone          *go_types.String               `json:"sender_phone"`
+	SenderURL            *go_types.String               `json:"sender_url"`
+	SenderReminder       *go_types.String               `json:"sender_reminder"`
+	FullAddress          *go_types.String               `json:"fulladdress"`
 	OptInMessageID       *go_types.Int64String          `json:"optinmessageid"`
 	OptOutConf           *go_types.Int64String          `json:"optoutconf"`
 	DeleteStamp          json.RawMessage                `json:"deletestamp"`
@@ -64,7 +64,6 @@ type List struct {
 	UpdatedBy            *go_types.Int64String          `json:"updated_by"`
 	Links                *Links                         `json:"links"`
 	ID                   go_types.Int64String           `json:"id"`
-	User                 go_types.Int64String           `json:"user"`
 }
 
 type GetListsConfig struct {

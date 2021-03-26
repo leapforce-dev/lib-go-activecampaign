@@ -22,19 +22,19 @@ type Contacts struct {
 type Contact struct {
 	CreatedDate         a_types.DateTimeTimezoneString  `json:"cdate"`
 	Email               string                          `json:"email"`
-	Phone               *string                         `json:"phone"`
-	FirstName           *string                         `json:"firstName"`
-	LastName            *string                         `json:"lastName"`
+	Phone               *go_types.String                `json:"phone"`
+	FirstName           *go_types.String                `json:"firstName"`
+	LastName            *go_types.String                `json:"lastName"`
 	SegmentIOID         go_types.Int64String            `json:"segmentio_id"`
 	BouncedHard         go_types.Int64String            `json:"bounced_hard"`
 	BouncedSoft         go_types.Int64String            `json:"bounced_soft"`
 	BouncedDate         *a_types.DateString             `json:"bounced_date"`
-	IP                  *string                         `json:"ip"`
-	UA                  *string                         `json:"ua"`
+	IP                  *go_types.String                `json:"ip"`
+	UA                  *go_types.String                `json:"ua"`
 	Hash                string                          `json:"hash"`
 	SocialdataLastcheck a_types.DateTimeString          `json:"socialdata_lastcheck"`
-	EmailLocal          *string                         `json:"email_local"`
-	EmailDomain         *string                         `json:"email_domain"`
+	EmailLocal          *go_types.String                `json:"email_local"`
+	EmailDomain         *go_types.String                `json:"email_domain"`
 	SentCount           go_types.Int64String            `json:"sentcnt"`
 	RatingDate          *a_types.DateString             `json:"rating_tstamp"`
 	Gravatar            go_types.Int64String            `json:"gravatar"`
@@ -57,7 +57,7 @@ type Contact struct {
 	FieldValueIDs       *go_types.Int64Strings          `json:"fieldValues"`
 	Links               *Links                          `json:"links"`
 	ID                  go_types.Int64String            `json:"id"`
-	Organization        *go_types.Int64String           `json:"organization"`
+	OrganizationID      *go_types.Int64String           `json:"organization"`
 	ContactLists        *[]ContactList                  `json:"-"`
 	FieldValues         *[]FieldValueContact            `json:"-"`
 }
