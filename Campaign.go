@@ -104,13 +104,6 @@ type Campaign struct {
 	AutomationID          *go_types.Int64String           `json:"automation"`
 }
 
-type OrderByDirection string
-
-const (
-	OrderByDirectionAscending  OrderByDirection = "ASC"
-	OrderByDirectionDescending OrderByDirection = "DESC"
-)
-
 type GetCampaignsConfig struct {
 	Limit           *uint
 	OrderBySendDate *OrderByDirection

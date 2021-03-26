@@ -1,13 +1,79 @@
 package activecampaign
 
+import (
+	"fmt"
+	"net/url"
+
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
+	errortools "github.com/leapforce-libraries/go_errortools"
+	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
+)
+
+type ContactTags struct {
+	ContactTags []ContactTag `json:"contactTags"`
+	Meta        Meta         `json:"meta"`
+}
+
 type ContactTag struct {
-	Contact          string `json:"contact"`
-	Tag              string `json:"tag"`
-	CreatedDate      string `json:"cdate"`
-	CreatedTimestamp string `json:"created_timestamp"`
-	UpdatedTimestamp string `json:"updated_timestamp"`
-	CreatedBy        string `json:"created_by"`
-	UpdatedBy        string `json:"updated_by"`
-	ID               string `json:"id"`
-	Links            *Links `json:"links"`
+	ContactID        go_types.Int64String           `json:"contact"`
+	TagID            go_types.Int64String           `json:"tag"`
+	CreatedDate      a_types.DateTimeTimezoneString `json:"cdate"`
+	CreatedTimestamp a_types.DateTimeString         `json:"created_timestamp"`
+	UpdatedTimestamp a_types.DateTimeString         `json:"updated_timestamp"`
+	CreatedBy        *go_types.String               `json:"created_by"`
+	UpdatedBy        *go_types.String               `json:"updated_by"`
+	Links            *Links                         `json:"links"`
+	ID               go_types.Int64String           `json:"id"`
+}
+
+type GetContactTagsConfig struct {
+	Limit     *uint
+	ContactID *int64
+}
+
+func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfig) (*ContactTags, *errortools.Error) {
+	params := url.Values{}
+
+	contactTags := ContactTags{}
+	offset := uint(0)
+	limit := defaultLimit
+
+	path := "contactTags"
+
+	if getContactTagsConfig != nil {
+		if getContactTagsConfig.ContactID != nil {
+			path = fmt.Sprintf("contacts/%v/contactTags", *getContactTagsConfig.ContactID)
+		}
+		if getContactTagsConfig.Limit != nil {
+			limit = *getContactTagsConfig.Limit
+		}
+	}
+
+	params.Add("limit", fmt.Sprintf("%v", limit))
+
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		contactTagsBatch := ContactTags{}
+
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
+			ResponseModel: &contactTags,
+		}
+
+		_, _, e := service.get(&requestConfig)
+		if e != nil {
+			return nil, e
+		}
+
+		contactTags.ContactTags = append(contactTags.ContactTags, contactTagsBatch.ContactTags...)
+
+		if len(contactTagsBatch.ContactTags) < int(limit) {
+			break
+		}
+		offset += limit
+	}
+
+	return &contactTags, nil
 }

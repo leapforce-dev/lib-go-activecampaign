@@ -5,12 +5,12 @@ import (
 	go_types "github.com/leapforce-libraries/go_types"
 )
 
-type FieldValuesDeal struct {
-	FieldValues []FieldValueDeal `json:"fieldValues"`
+type DealFieldValues struct {
+	FieldValues []DealFieldValue `json:"fieldValues"`
 	Meta        Meta             `json:"meta"`
 }
 
-type FieldValueDeal struct {
+type DealFieldValue struct {
 	DealID               go_types.Int64String    `json:"deal_id"`
 	FieldID              go_types.Int64String    `json:"custom_field_id"`
 	TextValue            *go_types.String        `json:"custom_field_text_value"`

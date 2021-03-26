@@ -37,12 +37,12 @@ type ContactList struct {
 	AutomationID            *go_types.Int64String           `json:"automation"`
 }
 
-func (service *Service) Subscribe(contactID int64, listID int64) *errortools.Error {
-	return service.setContactLists(contactID, listID, 1)
+func (service *Service) Subscribe(listID int64, contactID int64) *errortools.Error {
+	return service.setContactLists(listID, contactID, 1)
 }
 
-func (service *Service) Unsubscribe(contactID int64, listID int64) *errortools.Error {
-	return service.setContactLists(contactID, listID, 2)
+func (service *Service) Unsubscribe(listID int64, contactID int64) *errortools.Error {
+	return service.setContactLists(listID, contactID, 2)
 }
 
 func (service *Service) setContactLists(listID int64, contactID int64, status int64) *errortools.Error {

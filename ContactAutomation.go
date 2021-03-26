@@ -2,55 +2,87 @@ package activecampaign
 
 import (
 	"fmt"
+	"net/url"
 
+	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_types "github.com/leapforce-libraries/go_types"
 )
 
 type ContactAutomations struct {
 	ContactAutomations []ContactAutomation `json:"contactAutomations"`
-	//Meta     FieldValuesMeta `json:"meta"`
+	Meta               Meta                `json:"meta"`
 }
 
 type ContactAutomation struct {
-	Contact           string                 `json:"contact"`
-	SeriesID          string                 `json:"seriesid"`
-	StartID           string                 `json:"startid"`
-	BatchID           string                 `json:"batchid"`
-	AddDate           string                 `json:"adddate"`
-	RemDate           string                 `json:"remdate"`
-	Timespan          string                 `json:"timespan"`
-	LastBlock         string                 `json:"lastblock"`
-	LastLogID         string                 `json:"lastlogid"`
-	LastDate          string                 `json:"lastdate"`
-	InAls             string                 `json:"in_als"`
-	CompletedElements int                    `json:"completedElements"`
-	TotalElements     int                    `json:"totalElements"`
-	Completed         int                    `json:"completed"`
-	CompleteValue     int                    `json:"completeValue"`
-	ID                string                 `json:"id"`
-	Automation        string                 `json:"automation"`
-	Links             ContactAutomationLinks `json:"links"`
+	ContactID         go_types.Int64String            `json:"contact"`
+	SeriesID          go_types.Int64String            `json:"seriesid"`
+	StartID           go_types.Int64String            `json:"startid"`
+	Status            go_types.Int64String            `json:"status"`
+	BatchID           *go_types.String                `json:"batchid"`
+	AddDate           a_types.DateTimeTimezoneString  `json:"adddate"`
+	ReminderDate      *a_types.DateTimeTimezoneString `json:"remdate"`
+	Timespan          *go_types.Int64String           `json:"timespan"`
+	LastBlock         *go_types.Int64String           `json:"lastblock"`
+	LastLogID         *go_types.Int64String           `json:"lastlogid"`
+	LastDate          a_types.DateTimeTimezoneString  `json:"lastdate"`
+	InAls             go_types.Int64String            `json:"in_als"`
+	CompletedElements int64                           `json:"completedElements"`
+	TotalElements     int64                           `json:"totalElements"`
+	Completed         go_types.BoolInt                `json:"completed"`
+	CompleteValue     int64                           `json:"completeValue"`
+	Links             *Links                          `json:"links"`
+	ID                go_types.Int64String            `json:"id"`
+	AutomationID      go_types.Int64String            `json:"automation"`
 }
 
-type ContactAutomationLinks struct {
-	Automation     string `json:"automation"`
-	Contact        string `json:"contact"`
-	ContactGoals   string `json:"contactGoals"`
-	AutomationLogs string `json:"automationLogs"`
+type GetContactAutomationsConfig struct {
+	Limit     *uint
+	ContactID *int64
 }
 
-func (service *Service) GetContactAutomations(automationID string) (*ContactAutomations, *errortools.Error) {
+func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetContactAutomationsConfig) (*ContactAutomations, *errortools.Error) {
+	params := url.Values{}
+
 	contactAutomations := ContactAutomations{}
+	offset := uint(0)
+	limit := defaultLimit
 
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url(fmt.Sprintf("automations/%s/contactAutomations", automationID)),
-		ResponseModel: &contactAutomations,
+	path := "contactAutomations"
+
+	if getContactAutomationsConfig != nil {
+		if getContactAutomationsConfig.ContactID != nil {
+			path = fmt.Sprintf("contacts/%v/contactAutomations", *getContactAutomationsConfig.ContactID)
+		}
+		if getContactAutomationsConfig.Limit != nil {
+			limit = *getContactAutomationsConfig.Limit
+		}
 	}
 
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
+	params.Add("limit", fmt.Sprintf("%v", limit))
+
+	for true {
+		params.Set("offset", fmt.Sprintf("%v", offset))
+
+		contactAutomationsBatch := ContactAutomations{}
+
+		requestConfig := go_http.RequestConfig{
+			URL:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
+			ResponseModel: &contactAutomations,
+		}
+
+		_, _, e := service.get(&requestConfig)
+		if e != nil {
+			return nil, e
+		}
+
+		contactAutomations.ContactAutomations = append(contactAutomations.ContactAutomations, contactAutomationsBatch.ContactAutomations...)
+
+		if len(contactAutomationsBatch.ContactAutomations) < int(limit) {
+			break
+		}
+		offset += limit
 	}
 
 	return &contactAutomations, nil

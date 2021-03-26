@@ -13,85 +13,82 @@ import (
 )
 
 type Contacts struct {
-	ContactLists *[]ContactList       `json:"contactLists"`
-	FieldValues  *[]FieldValueContact `json:"fieldValues"`
-	Contacts     []Contact            `json:"contacts"`
-	Meta         Meta                 `json:"meta"`
+	ContactAutomations *[]ContactAutomation `json:"contactAutomations"`
+	ContactLists       *[]ContactList       `json:"contactLists"`
+	ContactTags        *[]ContactTag        `json:"contactTags"`
+	FieldValues        *[]ContactFieldValue `json:"fieldValues"`
+	Contacts           []Contact            `json:"contacts"`
+	Meta               Meta                 `json:"meta"`
 }
 
 type Contact struct {
-	CreatedDate         a_types.DateTimeTimezoneString  `json:"cdate"`
-	Email               string                          `json:"email"`
-	Phone               *go_types.String                `json:"phone"`
-	FirstName           *go_types.String                `json:"firstName"`
-	LastName            *go_types.String                `json:"lastName"`
-	SegmentIOID         go_types.Int64String            `json:"segmentio_id"`
-	BouncedHard         go_types.Int64String            `json:"bounced_hard"`
-	BouncedSoft         go_types.Int64String            `json:"bounced_soft"`
-	BouncedDate         *a_types.DateString             `json:"bounced_date"`
-	IP                  *go_types.String                `json:"ip"`
-	UA                  *go_types.String                `json:"ua"`
-	Hash                string                          `json:"hash"`
-	SocialdataLastcheck a_types.DateTimeString          `json:"socialdata_lastcheck"`
-	EmailLocal          *go_types.String                `json:"email_local"`
-	EmailDomain         *go_types.String                `json:"email_domain"`
-	SentCount           go_types.Int64String            `json:"sentcnt"`
-	RatingDate          *a_types.DateString             `json:"rating_tstamp"`
-	Gravatar            go_types.Int64String            `json:"gravatar"`
-	Deleted             go_types.BoolString             `json:"deleted"`
-	Anonymized          go_types.BoolString             `json:"anonymized"`
-	ADate               a_types.DateTimeTimezoneString  `json:"adate"`
-	UpdatedDate         a_types.DateTimeTimezoneString  `json:"udate"`
-	EDate               *a_types.DateTimeTimezoneString `json:"edate"`
-	DeletedDate         *a_types.DateTimeString         `json:"deleted_at"`
-	CreatedUTCTimestamp a_types.DateTimeString          `json:"created_utc_timestamp"`
-	UpdatedUTCTimestamp a_types.DateTimeString          `json:"updated_utc_timestamp"`
-	CreatedTimestamp    a_types.DateTimeString          `json:"created_timestamp"`
-	UpdatedTimestamp    a_types.DateTimeString          `json:"updated_timestamp"`
-	CreatedBy           *go_types.Int64String           `json:"created_by"`
-	UpdatedBy           *go_types.Int64String           `json:"updated_by"`
-	EmailEmpty          bool                            `json:"email_empty"`
-	ScoreValues         *go_types.Int64Strings          `json:"scoreValues"`
-	AccountContacts     *go_types.Int64Strings          `json:"accountContacts"`
-	ContactListIDs      *go_types.Int64Strings          `json:"contactLists"`
-	FieldValueIDs       *go_types.Int64Strings          `json:"fieldValues"`
-	Links               *Links                          `json:"links"`
-	ID                  go_types.Int64String            `json:"id"`
-	OrganizationID      *go_types.Int64String           `json:"organization"`
-	ContactLists        *[]ContactList                  `json:"-"`
-	FieldValues         *[]FieldValueContact            `json:"-"`
+	CreatedDate          a_types.DateTimeTimezoneString  `json:"cdate"`
+	Email                string                          `json:"email"`
+	Phone                *go_types.String                `json:"phone"`
+	FirstName            *go_types.String                `json:"firstName"`
+	LastName             *go_types.String                `json:"lastName"`
+	SegmentIOID          go_types.Int64String            `json:"segmentio_id"`
+	BouncedHard          go_types.Int64String            `json:"bounced_hard"`
+	BouncedSoft          go_types.Int64String            `json:"bounced_soft"`
+	BouncedDate          *a_types.DateString             `json:"bounced_date"`
+	IP                   *go_types.String                `json:"ip"`
+	UA                   *go_types.String                `json:"ua"`
+	Hash                 string                          `json:"hash"`
+	SocialdataLastcheck  a_types.DateTimeString          `json:"socialdata_lastcheck"`
+	EmailLocal           *go_types.String                `json:"email_local"`
+	EmailDomain          *go_types.String                `json:"email_domain"`
+	SentCount            go_types.Int64String            `json:"sentcnt"`
+	RatingDate           *a_types.DateString             `json:"rating_tstamp"`
+	Gravatar             go_types.Int64String            `json:"gravatar"`
+	Deleted              go_types.BoolString             `json:"deleted"`
+	Anonymized           go_types.BoolString             `json:"anonymized"`
+	ADate                a_types.DateTimeTimezoneString  `json:"adate"`
+	UpdatedDate          a_types.DateTimeTimezoneString  `json:"udate"`
+	EDate                *a_types.DateTimeTimezoneString `json:"edate"`
+	DeletedDate          *a_types.DateTimeString         `json:"deleted_at"`
+	CreatedUTCTimestamp  a_types.DateTimeString          `json:"created_utc_timestamp"`
+	UpdatedUTCTimestamp  a_types.DateTimeString          `json:"updated_utc_timestamp"`
+	CreatedTimestamp     a_types.DateTimeString          `json:"created_timestamp"`
+	UpdatedTimestamp     a_types.DateTimeString          `json:"updated_timestamp"`
+	CreatedBy            *go_types.Int64String           `json:"created_by"`
+	UpdatedBy            *go_types.Int64String           `json:"updated_by"`
+	EmailEmpty           bool                            `json:"email_empty"`
+	ScoreValues          *go_types.Int64Strings          `json:"scoreValues"`
+	AccountContacts      *go_types.Int64Strings          `json:"accountContacts"`
+	ContactAutomationIDs *go_types.Int64Strings          `json:"contactAutomations"`
+	ContactListIDs       *go_types.Int64Strings          `json:"contactLists"`
+	ContactTagIDs        *go_types.Int64Strings          `json:"contactTags"`
+	FieldValueIDs        *go_types.Int64Strings          `json:"fieldValues"`
+	Links                *Links                          `json:"links"`
+	ID                   go_types.Int64String            `json:"id"`
+	OrganizationID       *go_types.Int64String           `json:"organization"`
+	ContactAutomations   *[]ContactAutomation            `json:"-"`
+	ContactLists         *[]ContactList                  `json:"-"`
+	ContactTags          *[]ContactTag                   `json:"-"`
+	FieldValues          *[]ContactFieldValue            `json:"-"`
 }
 
 type ContactSync struct {
-	Email       string        `json:"email"`
-	FirstName   string        `json:"firstName,omitempty"`
-	LastName    string        `json:"lastName,omitempty"`
-	Phone       string        `json:"phone,omitempty"`
-	FieldValues []CustomField `json:"fieldValues,omitempty"`
-}
-
-type ContactSynced struct {
-	Email      string            `json:"email"`
-	FirstName  string            `json:"firstName"`
-	LastName   string            `json:"lastName"`
-	Phone      string            `json:"phone"`
-	CreateDate string            `json:"cdate"`
-	UpdateDate string            `json:"udate"`
-	Links      map[string]string `json:"links"`
-	ID         string            `json:"id"`
+	Email       string              `json:"email"`
+	FirstName   string              `json:"firstName,omitempty"`
+	LastName    string              `json:"lastName,omitempty"`
+	Phone       string              `json:"phone,omitempty"`
+	FieldValues []ContactFieldValue `json:"fieldValues,omitempty"`
 }
 
 type ContactInclude string
 
 const (
-	ContactIncludeFieldValues  ContactInclude = "fieldValues"
-	ContactIncludeContactLists ContactInclude = "contactLists"
+	ContactIncludeContactAutomations ContactInclude = "contactAutomations"
+	ContactIncludeContactLists       ContactInclude = "contactLists"
+	ContactIncludeContactTags        ContactInclude = "contactTags"
+	ContactIncludeFieldValues        ContactInclude = "fieldValues"
 )
 
 type GetContactsConfig struct {
 	Limit        *uint
 	Email        *string
-	ListID       *string
+	ListID       *int64
 	CreatedAfter *time.Time
 	UpdatedAfter *time.Time
 	Include      *[]ContactInclude
@@ -112,7 +109,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			params.Add("email", *getContactsConfig.Email)
 		}
 		if getContactsConfig.ListID != nil {
-			params.Add("listid", *getContactsConfig.ListID)
+			params.Add("listid", fmt.Sprintf("%v", *getContactsConfig.ListID))
 		}
 		if getContactsConfig.CreatedAfter != nil {
 			params.Add("filters[created_after]", (*getContactsConfig.CreatedAfter).Format(TimestampFormat))
@@ -146,6 +143,18 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			return nil, e
 		}
 
+		if contactsBatch.ContactAutomations != nil {
+			for i, contact := range contactsBatch.Contacts {
+				var contactAutomations []ContactAutomation
+				for _, contactAutomation := range *contactsBatch.ContactAutomations {
+					if contact.ID == contactAutomation.ContactID {
+						contactAutomations = append(contactAutomations, contactAutomation)
+					}
+				}
+				contactsBatch.Contacts[i].ContactAutomations = &contactAutomations
+			}
+		}
+
 		if contactsBatch.ContactLists != nil {
 			for i, contact := range contactsBatch.Contacts {
 				var contactLists []ContactList
@@ -157,9 +166,22 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 				contactsBatch.Contacts[i].ContactLists = &contactLists
 			}
 		}
+
+		if contactsBatch.ContactTags != nil {
+			for i, contact := range contactsBatch.Contacts {
+				var contactTags []ContactTag
+				for _, contactTag := range *contactsBatch.ContactTags {
+					if contact.ID == contactTag.ContactID {
+						contactTags = append(contactTags, contactTag)
+					}
+				}
+				contactsBatch.Contacts[i].ContactTags = &contactTags
+			}
+		}
+
 		if contactsBatch.FieldValues != nil {
 			for i, contact := range contactsBatch.Contacts {
-				var fieldValues []FieldValueContact
+				var fieldValues []ContactFieldValue
 				for _, fieldValue := range *contactsBatch.FieldValues {
 					if contact.ID == fieldValue.ContactID {
 						fieldValues = append(fieldValues, fieldValue)
@@ -179,7 +201,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	return &contacts, nil
 }
 
-func (service *Service) SyncContact(contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
+func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *errortools.Error) {
 	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
@@ -187,7 +209,7 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*ContactSynced, 
 	}
 
 	var contactCreated struct {
-		Contact ContactSynced `json:"contact"`
+		Contact Contact `json:"contact"`
 	}
 
 	requestConfig := go_http.RequestConfig{
@@ -204,7 +226,7 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*ContactSynced, 
 	return &contactCreated.Contact, nil
 }
 
-func (service *Service) UpdateContact(contactID string, contactCreate ContactSync) (*ContactSynced, *errortools.Error) {
+func (service *Service) UpdateContact(contactID string, contactCreate ContactSync) (*Contact, *errortools.Error) {
 	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
@@ -212,7 +234,7 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 	}
 
 	var contactUpdated struct {
-		Contact ContactSynced `json:"contact"`
+		Contact Contact `json:"contact"`
 	}
 
 	requestConfig := go_http.RequestConfig{
@@ -240,22 +262,4 @@ func (service *Service) DeleteContact(contactID string) *errortools.Error {
 	}
 
 	return nil
-}
-
-func (service *Service) GetContactFieldValues(contactID int64) (*[]CustomField, *errortools.Error) {
-	fieldValues := struct {
-		FieldValues []CustomField `json:"fieldValues"`
-	}{}
-
-	requestConfig := go_http.RequestConfig{
-		URL:           service.url(fmt.Sprintf("contacts/%v/fieldValues", contactID)),
-		ResponseModel: &fieldValues,
-	}
-
-	_, _, e := service.get(&requestConfig)
-	if e != nil {
-		return nil, e
-	}
-
-	return &fieldValues.FieldValues, nil
 }

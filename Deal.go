@@ -13,7 +13,7 @@ import (
 )
 
 type Deals struct {
-	FieldValues *[]FieldValueDeal `json:"dealCustomFieldData"`
+	FieldValues *[]DealFieldValue `json:"dealCustomFieldData"`
 	Deals       []Deal            `json:"deals"`
 	Meta        MetaNew           `json:"meta"`
 }
@@ -23,8 +23,8 @@ type Deal struct {
 	OwnerID                    go_types.Int64String            `json:"owner"`
 	ContactID                  go_types.Int64String            `json:"contact"`
 	OrganizationID             *go_types.Int64String           `json:"organization"`
-	Group                      go_types.Int64String            `json:"group"`
-	Stage                      go_types.Int64String            `json:"stage"`
+	GroupID                    go_types.Int64String            `json:"group"`
+	StageID                    go_types.Int64String            `json:"stage"`
 	Title                      string                          `json:"title"`
 	Description                string                          `json:"description"`
 	Percent                    go_types.Int64String            `json:"percent"`
@@ -46,7 +46,7 @@ type Deal struct {
 	IsDisabled                 bool                            `json:"isDisabled"`
 	AccountID                  *go_types.Int64String           `json:"account"`
 	CustomerAccountID          *go_types.Int64String           `json:"customerAccount"`
-	FieldValues                *[]FieldValueDeal               `json:"-"`
+	FieldValues                *[]DealFieldValue               `json:"-"`
 }
 
 type DealInclude string
@@ -107,7 +107,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 
 		if dealsBatch.FieldValues != nil {
 			for i, deal := range dealsBatch.Deals {
-				var fieldValues []FieldValueDeal
+				var fieldValues []DealFieldValue
 				for _, fieldValue := range *dealsBatch.FieldValues {
 					if deal.ID == fieldValue.DealID {
 						fieldValues = append(fieldValues, fieldValue)
