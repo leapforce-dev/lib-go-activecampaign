@@ -84,7 +84,7 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 		contactFieldsBatch := ContactFields{}
 
 		requestConfig := go_http.RequestConfig{
-			URL:           service.url(fmt.Sprintf("contactFields?%s", params.Encode())),
+			URL:           service.url(fmt.Sprintf("fields?%s", params.Encode())),
 			ResponseModel: &contactFieldsBatch,
 		}
 
