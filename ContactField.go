@@ -13,7 +13,7 @@ import (
 type ContactFields struct {
 	FieldOptions   []ContactFieldOption   `json:"fieldOptions"`
 	FieldRelations []ContactFieldRelation `json:"fieldRels"`
-	ContactFields  []ContactField         `json:"contactFields"`
+	ContactFields  []ContactField         `json:"fields"`
 	Meta           Meta                   `json:"meta"`
 }
 
