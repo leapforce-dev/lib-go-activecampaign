@@ -28,14 +28,14 @@ type ContactFieldValue struct {
 	Links       *Links                         `json:"links,omitempty"`
 }
 
-type GetFieldValuesConfig struct {
+type GetContactFieldValuesConfig struct {
 	Limit     *uint
 	ContactID *int64
 	FieldID   *int64
 	Value     *string
 }
 
-func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetFieldValuesConfig) (*ContactFieldValues, *errortools.Error) {
+func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFieldValuesConfig) (*ContactFieldValues, *errortools.Error) {
 	params := url.Values{}
 
 	fieldValues := ContactFieldValues{}
