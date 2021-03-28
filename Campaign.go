@@ -140,7 +140,6 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 			URL:           service.url(fmt.Sprintf("campaigns?%s", params.Encode())),
 			ResponseModel: &campaignsBatch,
 		}
-		fmt.Println(service.url(fmt.Sprintf("campaigns?%s", params.Encode())))
 
 		_, _, e := service.get(&requestConfig)
 		if e != nil {
