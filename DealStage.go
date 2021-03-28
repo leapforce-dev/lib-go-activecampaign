@@ -34,7 +34,8 @@ type DealStage struct {
 }
 
 type GetDealStagesConfig struct {
-	Limit        *uint
+	Limit        *uint64
+	Offset       *uint64
 	Title        *string
 	GroupID      *int64
 	OrderByTitle *OrderByDirection
@@ -44,12 +45,15 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 	params := url.Values{}
 
 	dealStages := DealStages{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getDealStagesConfig != nil {
 		if getDealStagesConfig.Limit != nil {
 			limit = *getDealStagesConfig.Limit
+		}
+		if getDealStagesConfig.Offset != nil {
+			service.nextOffsets.DealStage = *getDealStagesConfig.Offset
 		}
 		if getDealStagesConfig.Title != nil {
 			params.Add("filters[title]", *getDealStagesConfig.Title)
@@ -64,7 +68,7 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.DealStage))
 
 		dealStagesBatch := DealStages{}
 
@@ -79,9 +83,16 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 		}
 
 		if len(dealStagesBatch.DealStages) < int(limit) {
+			service.nextOffsets.DealStage = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.DealStage += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &dealStages, nil
+		}
 	}
 
 	return &dealStages, nil

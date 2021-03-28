@@ -38,7 +38,8 @@ type ContactAutomation struct {
 }
 
 type GetContactAutomationsConfig struct {
-	Limit     *uint
+	Limit     *uint64
+	Offset    *uint64
 	ContactID *int64
 }
 
@@ -46,7 +47,7 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 	params := url.Values{}
 
 	contactAutomations := ContactAutomations{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	path := "contactAutomations"
@@ -58,12 +59,15 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 		if getContactAutomationsConfig.Limit != nil {
 			limit = *getContactAutomationsConfig.Limit
 		}
+		if getContactAutomationsConfig.Offset != nil {
+			service.nextOffsets.ContactAutomation = *getContactAutomationsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.ContactAutomation))
 
 		contactAutomationsBatch := ContactAutomations{}
 
@@ -80,9 +84,16 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 		contactAutomations.ContactAutomations = append(contactAutomations.ContactAutomations, contactAutomationsBatch.ContactAutomations...)
 
 		if len(contactAutomationsBatch.ContactAutomations) < int(limit) {
+			service.nextOffsets.ContactAutomation = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.ContactAutomation += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &contactAutomations, nil
+		}
 	}
 
 	return &contactAutomations, nil

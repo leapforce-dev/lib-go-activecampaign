@@ -53,10 +53,10 @@ type Campaign struct {
 	UniqueReplies         go_types.Int64String            `json:"uniquereplies"`
 	Status                go_types.Int64String            `json:"status"`
 	Public                go_types.BoolString             `json:"public"`
-	MailTransfer          go_types.BoolString             `json:"mail_transfer"`
-	MailSend              go_types.BoolString             `json:"mail_send"`
-	MailCleanup           go_types.BoolString             `json:"mail_cleanup"`
-	MailerLogFile         go_types.BoolString             `json:"mailer_log_file"`
+	MailTransfer          go_types.Int64String            `json:"mail_transfer"`
+	MailSend              go_types.Int64String            `json:"mail_send"`
+	MailCleanup           go_types.Int64String            `json:"mail_cleanup"`
+	MailerLogFile         go_types.Int64String            `json:"mailer_log_file"`
 	TrackLinks            *go_types.String                `json:"tracklinks"`
 	TrackLinksAnalytics   go_types.BoolString             `json:"tracklinksanalytics"`
 	TrackReads            go_types.BoolString             `json:"trackreads"`
@@ -95,7 +95,7 @@ type Campaign struct {
 	LastStep              *go_types.String                `json:"laststep"`
 	ManageText            go_types.BoolString             `json:"managetext"`
 	Schedule              go_types.BoolString             `json:"schedule"`
-	ScheduleDate          *a_types.DateTimeString         `json:"scheduleddate"`
+	ScheduleDate          *a_types.DateTimeTimezoneString `json:"scheduleddate"`
 	WaitPreview           go_types.BoolString             `json:"waitpreview"`
 	DeleteStamp           *a_types.DateTimeString         `json:"deletestamp"`
 	ReplySys              go_types.BoolString             `json:"replysys"`
@@ -105,7 +105,8 @@ type Campaign struct {
 }
 
 type GetCampaignsConfig struct {
-	Limit           *uint
+	Limit           *uint64
+	Offset          *uint64
 	OrderBySendDate *OrderByDirection
 }
 
@@ -113,7 +114,7 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 	params := url.Values{}
 
 	campaigns := Campaigns{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getCampaignsConfig != nil {
@@ -123,12 +124,15 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 		if getCampaignsConfig.Limit != nil {
 			limit = *getCampaignsConfig.Limit
 		}
+		if getCampaignsConfig.Offset != nil {
+			service.nextOffsets.Campaign = *getCampaignsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Campaign))
 
 		campaignsBatch := Campaigns{}
 
@@ -136,6 +140,7 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 			URL:           service.url(fmt.Sprintf("campaigns?%s", params.Encode())),
 			ResponseModel: &campaignsBatch,
 		}
+		fmt.Println(service.url(fmt.Sprintf("campaigns?%s", params.Encode())))
 
 		_, _, e := service.get(&requestConfig)
 		if e != nil {
@@ -145,9 +150,16 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 		campaigns.Campaigns = append(campaigns.Campaigns, campaignsBatch.Campaigns...)
 
 		if len(campaignsBatch.Campaigns) < int(limit) {
+			service.nextOffsets.Campaign = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Campaign += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &campaigns, nil
+		}
 	}
 
 	return &campaigns, nil

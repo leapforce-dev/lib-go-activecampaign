@@ -67,15 +67,16 @@ type List struct {
 }
 
 type GetListsConfig struct {
-	Limit *uint
-	Name  *string
+	Limit  *uint64
+	Offset *uint64
+	Name   *string
 }
 
 func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *errortools.Error) {
 	params := url.Values{}
 
 	lists := Lists{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getListsConfig != nil {
@@ -85,11 +86,14 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 		if getListsConfig.Limit != nil {
 			limit = *getListsConfig.Limit
 		}
+		if getListsConfig.Offset != nil {
+			service.nextOffsets.List = *getListsConfig.Offset
+		}
 	}
 	params.Set("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.List))
 
 		listsBatch := Lists{}
 
@@ -106,9 +110,16 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 		lists.Lists = append(lists.Lists, listsBatch.Lists...)
 
 		if len(listsBatch.Lists) < int(limit) {
+			service.nextOffsets.List = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.List += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &lists, nil
+		}
 	}
 
 	return &lists, nil

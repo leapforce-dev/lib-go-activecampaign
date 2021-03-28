@@ -60,26 +60,30 @@ type ContactField struct {
 }
 
 type GetContactFieldsConfig struct {
-	Limit *uint
+	Limit  *uint64
+	Offset *uint64
 }
 
 func (service *Service) GetContactFields(getContactFieldsConfig *GetContactFieldsConfig) (*ContactFields, *errortools.Error) {
 	params := url.Values{}
 
 	contactFields := ContactFields{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getContactFieldsConfig != nil {
 		if getContactFieldsConfig.Limit != nil {
 			limit = *getContactFieldsConfig.Limit
 		}
+		if getContactFieldsConfig.Offset != nil {
+			service.nextOffsets.ContactField = *getContactFieldsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.ContactField))
 
 		contactFieldsBatch := ContactFields{}
 
@@ -96,9 +100,16 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 		contactFields.ContactFields = append(contactFields.ContactFields, contactFieldsBatch.ContactFields...)
 
 		if len(contactFieldsBatch.ContactFields) < int(limit) {
+			service.nextOffsets.ContactField = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.ContactField += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &contactFields, nil
+		}
 	}
 
 	return &contactFields, nil

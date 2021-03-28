@@ -32,26 +32,30 @@ type DealField struct {
 }
 
 type GetDealFieldsConfig struct {
-	Limit *uint
+	Limit  *uint64
+	Offset *uint64
 }
 
 func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) (*DealFields, *errortools.Error) {
 	params := url.Values{}
 
 	dealFields := DealFields{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getDealFieldsConfig != nil {
 		if getDealFieldsConfig.Limit != nil {
 			limit = *getDealFieldsConfig.Limit
 		}
+		if getDealFieldsConfig.Offset != nil {
+			service.nextOffsets.DealField = *getDealFieldsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.DealField))
 
 		dealFieldsBatch := DealFields{}
 
@@ -68,9 +72,16 @@ func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) 
 		dealFields.DealFields = append(dealFields.DealFields, dealFieldsBatch.DealFields...)
 
 		if len(dealFieldsBatch.DealFields) < int(limit) {
+			service.nextOffsets.DealField = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.DealField += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &dealFields, nil
+		}
 	}
 
 	return &dealFields, nil

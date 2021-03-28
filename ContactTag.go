@@ -28,7 +28,8 @@ type ContactTag struct {
 }
 
 type GetContactTagsConfig struct {
-	Limit     *uint
+	Limit     *uint64
+	Offset    *uint64
 	ContactID *int64
 }
 
@@ -36,7 +37,7 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 	params := url.Values{}
 
 	contactTags := ContactTags{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	path := "contactTags"
@@ -48,12 +49,15 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 		if getContactTagsConfig.Limit != nil {
 			limit = *getContactTagsConfig.Limit
 		}
+		if getContactTagsConfig.Offset != nil {
+			service.nextOffsets.ContactTag = *getContactTagsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.ContactTag))
 
 		contactTagsBatch := ContactTags{}
 
@@ -70,9 +74,16 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 		contactTags.ContactTags = append(contactTags.ContactTags, contactTagsBatch.ContactTags...)
 
 		if len(contactTagsBatch.ContactTags) < int(limit) {
+			service.nextOffsets.ContactTag = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.ContactTag += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &contactTags, nil
+		}
 	}
 
 	return &contactTags, nil

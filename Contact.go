@@ -86,7 +86,8 @@ const (
 )
 
 type GetContactsConfig struct {
-	Limit        *uint
+	Limit        *uint64
+	Offset       *uint64
 	Email        *string
 	ListID       *int64
 	CreatedAfter *time.Time
@@ -98,12 +99,15 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	params := url.Values{}
 
 	contacts := Contacts{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getContactsConfig != nil {
 		if getContactsConfig.Limit != nil {
 			limit = *getContactsConfig.Limit
+		}
+		if getContactsConfig.Offset != nil {
+			service.nextOffsets.Contact = *getContactsConfig.Offset
 		}
 		if getContactsConfig.Email != nil {
 			params.Add("email", *getContactsConfig.Email)
@@ -129,7 +133,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Contact))
 
 		contactsBatch := Contacts{}
 
@@ -193,9 +197,16 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		contacts.Contacts = append(contacts.Contacts, contactsBatch.Contacts...)
 
 		if len(contactsBatch.Contacts) < int(limit) {
+			service.nextOffsets.Contact = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Contact += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &contacts, nil
+		}
 	}
 
 	return &contacts, nil

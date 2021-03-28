@@ -29,26 +29,30 @@ type Segment struct {
 }
 
 type GetSegmentsConfig struct {
-	Limit *uint
+	Limit  *uint64
+	Offset *uint64
 }
 
 func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segments, *errortools.Error) {
 	params := url.Values{}
 
 	segments := Segments{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getSegmentsConfig != nil {
 		if getSegmentsConfig.Limit != nil {
 			limit = *getSegmentsConfig.Limit
 		}
+		if getSegmentsConfig.Offset != nil {
+			service.nextOffsets.Segment = *getSegmentsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Segment))
 
 		segmentsBatch := Segments{}
 
@@ -65,9 +69,16 @@ func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segm
 		segments.Segments = append(segments.Segments, segmentsBatch.Segments...)
 
 		if len(segmentsBatch.Segments) < int(limit) {
+			service.nextOffsets.Segment = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Segment += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &segments, nil
+		}
 	}
 
 	return &segments, nil

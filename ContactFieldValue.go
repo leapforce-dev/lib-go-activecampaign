@@ -29,7 +29,8 @@ type ContactFieldValue struct {
 }
 
 type GetContactFieldValuesConfig struct {
-	Limit     *uint
+	Limit     *uint64
+	Offset    *uint64
 	ContactID *int64
 	FieldID   *int64
 	Value     *string
@@ -39,7 +40,7 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 	params := url.Values{}
 
 	fieldValues := ContactFieldValues{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	path := "fieldValues"
@@ -57,12 +58,15 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 		if getFieldValuesConfig.Limit != nil {
 			limit = *getFieldValuesConfig.Limit
 		}
+		if getFieldValuesConfig.Offset != nil {
+			service.nextOffsets.ContactFieldValue = *getFieldValuesConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.ContactFieldValue))
 
 		fieldValuesBatch := ContactFieldValues{}
 
@@ -79,9 +83,16 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 		fieldValues.FieldValues = append(fieldValues.FieldValues, fieldValuesBatch.FieldValues...)
 
 		if len(fieldValuesBatch.FieldValues) < int(limit) {
+			service.nextOffsets.ContactFieldValue = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.ContactFieldValue += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &fieldValues, nil
+		}
 	}
 
 	return &fieldValues, nil

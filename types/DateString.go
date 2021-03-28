@@ -2,9 +2,11 @@ package facebook
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/civil"
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 const (
@@ -14,11 +16,16 @@ const (
 type DateString civil.Date
 
 func (d *DateString) UnmarshalJSON(b []byte) error {
+	var returnError = func() error {
+		errortools.CaptureError(fmt.Sprintf("Cannot parse '%s' to DateString", string(b)))
+		return nil
+	}
+
 	var s string
 
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		return err
+		return returnError()
 	}
 
 	if s == "" || s == "0000-00-00" {
@@ -28,7 +35,7 @@ func (d *DateString) UnmarshalJSON(b []byte) error {
 
 	_t, err := time.Parse(DateFormat, s)
 	if err != nil {
-		return err
+		return returnError()
 	}
 
 	*d = DateString(civil.DateOf(_t))

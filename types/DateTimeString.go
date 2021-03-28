@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	errortools "github.com/leapforce-libraries/go_errortools"
 )
 
 const (
@@ -13,12 +15,17 @@ const (
 type DateTimeString time.Time
 
 func (d *DateTimeString) UnmarshalJSON(b []byte) error {
+	var returnError = func() error {
+		errortools.CaptureError(fmt.Sprintf("Cannot parse '%s' to DateTimeString", string(b)))
+		return nil
+	}
+
 	var s string
 
 	err := json.Unmarshal(b, &s)
 	if err != nil {
 		fmt.Println("DateTimeString", string(b))
-		return err
+		return returnError()
 	}
 
 	if s == "" || s == "0000-00-00 00:00:00" {
@@ -28,7 +35,7 @@ func (d *DateTimeString) UnmarshalJSON(b []byte) error {
 
 	_t, err := time.Parse(DateTimeFormat, s)
 	if err != nil {
-		return err
+		return returnError()
 	}
 
 	*d = DateTimeString(_t)

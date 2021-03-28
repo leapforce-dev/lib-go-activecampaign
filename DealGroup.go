@@ -32,7 +32,8 @@ type DealGroup struct {
 }
 
 type GetDealGroupsConfig struct {
-	Limit          *uint
+	Limit          *uint64
+	Offset         *uint64
 	Title          *string
 	HaveStages     *bool
 	OrderByTitle   *OrderByDirection
@@ -43,12 +44,15 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 	params := url.Values{}
 
 	dealGroups := DealGroups{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getDealGroupsConfig != nil {
 		if getDealGroupsConfig.Limit != nil {
 			limit = *getDealGroupsConfig.Limit
+		}
+		if getDealGroupsConfig.Offset != nil {
+			service.nextOffsets.DealGroup = *getDealGroupsConfig.Offset
 		}
 		if getDealGroupsConfig.Title != nil {
 			params.Add("filters[title]", *getDealGroupsConfig.Title)
@@ -70,7 +74,7 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.DealGroup))
 
 		dealGroupsBatch := DealGroups{}
 
@@ -98,9 +102,16 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 		dealGroups.DealGroups = append(dealGroups.DealGroups, dealGroupsBatch.DealGroups...)
 
 		if len(dealGroupsBatch.DealGroups) < int(limit) {
+			service.nextOffsets.DealGroup = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.DealGroup += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &dealGroups, nil
+		}
 	}
 
 	return &dealGroups, nil

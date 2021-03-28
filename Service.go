@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	defaultLimit    uint   = 100
+	defaultLimit    uint64 = 100
 	TimestampFormat string = "2006-01-02 15:04:05"
 )
 
@@ -22,12 +22,31 @@ type CustomField struct {
 type Service struct {
 	host        string
 	apiKey      string
+	maxRowCount uint64
 	httpService *go_http.Service
+	nextOffsets struct {
+		Automation        uint64
+		Campaign          uint64
+		Contact           uint64
+		ContactAutomation uint64
+		ContactField      uint64
+		ContactFieldValue uint64
+		ContactTag        uint64
+		Deal              uint64
+		DealField         uint64
+		DealGroup         uint64
+		DealStage         uint64
+		List              uint64
+		Message           uint64
+		Segment           uint64
+		Tag               uint64
+	}
 }
 
 type ServiceConfig struct {
-	Host   string
-	APIKey string
+	Host        string
+	APIKey      string
+	MaxRowCount *uint64
 }
 
 func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
@@ -44,9 +63,14 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 		return nil, e
 	}
 
+	maxRowCount := ^uint64(0)
+	if serviceConfig.MaxRowCount != nil {
+		maxRowCount = *serviceConfig.MaxRowCount
+	}
 	return &Service{
 		host:        serviceConfig.Host,
 		apiKey:      serviceConfig.APIKey,
+		maxRowCount: maxRowCount,
 		httpService: httpService,
 	}, nil
 }

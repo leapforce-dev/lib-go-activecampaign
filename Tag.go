@@ -30,7 +30,8 @@ type Tag struct {
 }
 
 type GetTagsConfig struct {
-	Limit  *uint
+	Limit  *uint64
+	Offset *uint64
 	Search *string
 }
 
@@ -38,7 +39,7 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 	params := url.Values{}
 
 	tags := Tags{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getTagsConfig != nil {
@@ -48,12 +49,15 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 		if getTagsConfig.Limit != nil {
 			limit = *getTagsConfig.Limit
 		}
+		if getTagsConfig.Offset != nil {
+			service.nextOffsets.Tag = *getTagsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Tag))
 
 		tagsBatch := Tags{}
 
@@ -70,9 +74,16 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 		tags.Tags = append(tags.Tags, tagsBatch.Tags...)
 
 		if len(tagsBatch.Tags) < int(limit) {
+			service.nextOffsets.Tag = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Tag += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &tags, nil
+		}
 	}
 
 	return &tags, nil

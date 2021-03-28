@@ -56,7 +56,8 @@ const (
 )
 
 type GetDealsConfig struct {
-	Limit        *uint
+	Limit        *uint64
+	Offset       *uint64
 	CreatedAfter *time.Time
 	UpdatedAfter *time.Time
 	Include      *[]DealInclude
@@ -66,12 +67,15 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 	params := url.Values{}
 
 	deals := Deals{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getDealsConfig != nil {
 		if getDealsConfig.Limit != nil {
 			limit = *getDealsConfig.Limit
+		}
+		if getDealsConfig.Offset != nil {
+			service.nextOffsets.Deal = *getDealsConfig.Offset
 		}
 		if getDealsConfig.CreatedAfter != nil {
 			params.Add("filters[created_after]", (*getDealsConfig.CreatedAfter).Format(TimestampFormat))
@@ -91,7 +95,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Deal))
 
 		dealsBatch := Deals{}
 
@@ -119,9 +123,16 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 		deals.Deals = append(deals.Deals, dealsBatch.Deals...)
 
 		if len(dealsBatch.Deals) < int(limit) {
+			service.nextOffsets.Deal = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Deal += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &deals, nil
+		}
 	}
 
 	return &deals, nil

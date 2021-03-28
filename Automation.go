@@ -30,26 +30,30 @@ type Automation struct {
 }
 
 type GetAutomationsConfig struct {
-	Limit *uint
+	Limit  *uint64
+	Offset *uint64
 }
 
 func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfig) (*Automations, *errortools.Error) {
 	params := url.Values{}
 
 	automations := Automations{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getAutomationsConfig != nil {
 		if getAutomationsConfig.Limit != nil {
 			limit = *getAutomationsConfig.Limit
 		}
+		if getAutomationsConfig.Offset != nil {
+			service.nextOffsets.Automation = *getAutomationsConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Automation))
 
 		automationsBatch := Automations{}
 
@@ -66,9 +70,16 @@ func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfi
 		automations.Automations = append(automations.Automations, automationsBatch.Automations...)
 
 		if len(automationsBatch.Automations) < int(limit) {
+			service.nextOffsets.Automation = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Automation += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &automations, nil
+		}
 	}
 
 	return &automations, nil

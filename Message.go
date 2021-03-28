@@ -43,26 +43,30 @@ type Message struct {
 }
 
 type GetMessagesConfig struct {
-	Limit *uint
+	Limit  *uint64
+	Offset *uint64
 }
 
 func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Messages, *errortools.Error) {
 	params := url.Values{}
 
 	messages := Messages{}
-	offset := uint(0)
+	rowCount := uint64(0)
 	limit := defaultLimit
 
 	if getMessagesConfig != nil {
 		if getMessagesConfig.Limit != nil {
 			limit = *getMessagesConfig.Limit
 		}
+		if getMessagesConfig.Offset != nil {
+			service.nextOffsets.Message = *getMessagesConfig.Offset
+		}
 	}
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for true {
-		params.Set("offset", fmt.Sprintf("%v", offset))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Message))
 
 		messagesBatch := Messages{}
 
@@ -79,9 +83,16 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 		messages.Messages = append(messages.Messages, messagesBatch.Messages...)
 
 		if len(messagesBatch.Messages) < int(limit) {
+			service.nextOffsets.Message = 0
 			break
 		}
-		offset += limit
+
+		service.nextOffsets.Message += limit
+		rowCount += limit
+
+		if rowCount >= service.maxRowCount {
+			return &messages, nil
+		}
 	}
 
 	return &messages, nil
