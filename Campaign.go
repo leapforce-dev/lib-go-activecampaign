@@ -32,8 +32,8 @@ type Campaign struct {
 	Name                  string                          `json:"name"`
 	CreatedDate           a_types.DateTimeTimezoneString  `json:"cdate"`
 	ModifiedDate          a_types.DateTimeTimezoneString  `json:"mdate"`
-	SendDate              *a_types.DateTimeTimezoneString `json:"sdate"`
-	LDate                 *a_types.DateTimeTimezoneString `json:"ldate"`
+	FirstSendDate         *a_types.DateTimeTimezoneString `json:"sdate"`
+	LastSendDate          *a_types.DateTimeTimezoneString `json:"ldate"`
 	SendAmount            go_types.Int64String            `json:"send_amount"`
 	TotalAmount           go_types.Int64String            `json:"total_amt"`
 	Opens                 go_types.Int64String            `json:"opens"`
