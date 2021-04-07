@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	defaultLimit    uint64 = 100
-	TimestampFormat string = "2006-01-02 15:04:05"
+	defaultMaxRowCount uint64 = ^uint64(0)
+	defaultLimit       uint64 = 100
+	TimestampFormat    string = "2006-01-02 15:04:05"
 )
 
 /*
@@ -63,7 +64,7 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 		return nil, e
 	}
 
-	maxRowCount := ^uint64(0)
+	maxRowCount := defaultMaxRowCount
 	if serviceConfig.MaxRowCount != nil {
 		maxRowCount = *serviceConfig.MaxRowCount
 	}

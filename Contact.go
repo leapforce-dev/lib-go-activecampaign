@@ -220,7 +220,11 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 	}
 
 	var contactCreated struct {
-		Contact Contact `json:"contact"`
+		ContactAutomations *[]ContactAutomation `json:"contactAutomations"`
+		ContactLists       *[]ContactList       `json:"contactLists"`
+		ContactTags        *[]ContactTag        `json:"contactTags"`
+		FieldValues        *[]ContactFieldValue `json:"fieldValues"`
+		Contact            Contact              `json:"contact"`
 	}
 
 	requestConfig := go_http.RequestConfig{
@@ -233,6 +237,11 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 	if e != nil {
 		return nil, e
 	}
+
+	contactCreated.Contact.ContactAutomations = contactCreated.ContactAutomations
+	contactCreated.Contact.ContactLists = contactCreated.ContactLists
+	contactCreated.Contact.ContactTags = contactCreated.ContactTags
+	contactCreated.Contact.FieldValues = contactCreated.FieldValues
 
 	return &contactCreated.Contact, nil
 }
