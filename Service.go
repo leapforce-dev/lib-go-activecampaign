@@ -11,14 +11,8 @@ import (
 const (
 	defaultMaxRowCount uint64 = ^uint64(0)
 	defaultLimit       uint64 = 100
-	TimestampFormat    string = "2006-01-02 15:04:05"
+	timestampLayout    string = "2006-01-02 15:04:05"
 )
-
-/*
-type CustomField struct {
-	Field string `json:"field"`
-	Value string `json:"value"`
-}*/
 
 type Service struct {
 	host        string

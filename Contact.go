@@ -116,10 +116,10 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			params.Add("listid", fmt.Sprintf("%v", *getContactsConfig.ListID))
 		}
 		if getContactsConfig.CreatedAfter != nil {
-			params.Add("filters[created_after]", (*getContactsConfig.CreatedAfter).Format(TimestampFormat))
+			params.Add("filters[created_after]", (*getContactsConfig.CreatedAfter).Format(timestampLayout))
 		}
 		if getContactsConfig.UpdatedAfter != nil {
-			params.Add("filters[updated_after]", (*getContactsConfig.UpdatedAfter).Format(TimestampFormat))
+			params.Add("filters[updated_after]", (*getContactsConfig.UpdatedAfter).Format(timestampLayout))
 		}
 		if getContactsConfig.Include != nil {
 			includes := []string{}
@@ -271,9 +271,9 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 	return &contactUpdated.Contact, nil
 }
 
-func (service *Service) DeleteContact(contactID string) *errortools.Error {
+func (service *Service) DeleteContact(contactID int64) *errortools.Error {
 	requestConfig := go_http.RequestConfig{
-		URL: service.url(fmt.Sprintf("contacts/%s", contactID)),
+		URL: service.url(fmt.Sprintf("contacts/%v", contactID)),
 	}
 
 	_, _, e := service.delete(&requestConfig)

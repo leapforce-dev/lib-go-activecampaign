@@ -78,10 +78,10 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 			service.nextOffsets.Deal = *getDealsConfig.Offset
 		}
 		if getDealsConfig.CreatedAfter != nil {
-			params.Add("filters[created_after]", (*getDealsConfig.CreatedAfter).Format(TimestampFormat))
+			params.Add("filters[created_after]", (*getDealsConfig.CreatedAfter).Format(timestampLayout))
 		}
 		if getDealsConfig.UpdatedAfter != nil {
-			params.Add("filters[updated_after]", (*getDealsConfig.UpdatedAfter).Format(TimestampFormat))
+			params.Add("filters[updated_after]", (*getDealsConfig.UpdatedAfter).Format(timestampLayout))
 		}
 		if getDealsConfig.Include != nil {
 			includes := []string{}
