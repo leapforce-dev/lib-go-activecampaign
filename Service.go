@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	apiName            string = "ActiveCampaign"
 	defaultMaxRowCount uint64 = ^uint64(0)
 	defaultLimit       uint64 = 100
 	timestampLayout    string = "2006-01-02 15:04:05"
@@ -86,9 +87,11 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 	}
 
 	// activecampaign sometimes returns an error while the action has succesfully been performed
-	if response.StatusCode >= 200 && response.StatusCode <= 299 {
-		errortools.CaptureError(e)
-		return request, response, nil
+	if response != nil {
+		if response.StatusCode >= 200 && response.StatusCode <= 299 {
+			errortools.CaptureError(e)
+			return request, response, nil
+		}
 	}
 
 	return request, response, e
@@ -112,4 +115,16 @@ func (service *Service) put(requestConfig *go_http.RequestConfig) (*http.Request
 
 func (service *Service) delete(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
 	return service.httpRequest(http.MethodDelete, requestConfig)
+}
+
+func (service Service) APIName() string {
+	return apiName
+}
+
+func (service Service) APIKey() string {
+	return service.apiKey
+}
+
+func (service Service) APICallCount() int64 {
+	return service.httpService.RequestCount()
 }
