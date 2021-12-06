@@ -2,6 +2,7 @@ package activecampaign
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -94,17 +95,18 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	for true {
+	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Deal))
 
 		dealsBatch := Deals{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.url(fmt.Sprintf("deals?%s", params.Encode())),
 			ResponseModel: &dealsBatch,
 		}
 
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}

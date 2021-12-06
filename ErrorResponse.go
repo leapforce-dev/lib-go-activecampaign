@@ -10,6 +10,6 @@ type ErrorResponse struct {
 		Error  string `json:"error"`
 		Source struct {
 			Pointer string `json:"pointer"`
-		} `json:"error"`
+		} `json:"source"`
 	} `json:"errors"`
 }

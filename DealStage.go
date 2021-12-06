@@ -2,6 +2,7 @@ package activecampaign
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
@@ -67,17 +68,18 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	for true {
+	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.DealStage))
 
 		dealStagesBatch := DealStages{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.url(fmt.Sprintf("dealStages?%s", params.Encode())),
 			ResponseModel: &dealStagesBatch,
 		}
 
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}

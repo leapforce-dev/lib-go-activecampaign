@@ -2,6 +2,7 @@ package activecampaign
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -132,17 +133,18 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	for true {
+	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Contact))
 
 		contactsBatch := Contacts{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
 			ResponseModel: &contactsBatch,
 		}
 
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -228,12 +230,13 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 	}
 
 	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
 		URL:           service.url("contact/sync"),
 		BodyModel:     d,
 		ResponseModel: &contactCreated,
 	}
 
-	_, _, e := service.post(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -258,12 +261,13 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 	}
 
 	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
 		URL:           service.url(fmt.Sprintf("contacts/%s", contactID)),
 		BodyModel:     d,
 		ResponseModel: &contactUpdated,
 	}
 
-	_, _, e := service.post(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -273,10 +277,11 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 
 func (service *Service) DeleteContact(contactID int64) *errortools.Error {
 	requestConfig := go_http.RequestConfig{
-		URL: service.url(fmt.Sprintf("contacts/%v", contactID)),
+		Method: http.MethodDelete,
+		URL:    service.url(fmt.Sprintf("contacts/%v", contactID)),
 	}
 
-	_, _, e := service.delete(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return e
 	}

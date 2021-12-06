@@ -3,6 +3,7 @@ package activecampaign
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
@@ -92,17 +93,18 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 	}
 	params.Set("limit", fmt.Sprintf("%v", limit))
 
-	for true {
+	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.List))
 
 		listsBatch := Lists{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.url(fmt.Sprintf("lists?%s", params.Encode())),
 			ResponseModel: &listsBatch,
 		}
 
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}

@@ -1,6 +1,8 @@
 package activecampaign
 
 import (
+	"net/http"
+
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_http "github.com/leapforce-libraries/go_http"
@@ -65,11 +67,12 @@ func (service *Service) setContactLists(listID int64, contactID int64, status in
 	}
 
 	requestConfig := go_http.RequestConfig{
+		Method:    http.MethodPost,
 		URL:       service.url("contactLists"),
 		BodyModel: d,
 	}
 
-	_, _, e := service.post(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return e
 	}

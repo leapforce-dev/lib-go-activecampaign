@@ -2,6 +2,7 @@ package activecampaign
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
@@ -65,17 +66,18 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
-	for true {
+	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Message))
 
 		messagesBatch := Messages{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.url(fmt.Sprintf("messages?%s", params.Encode())),
 			ResponseModel: &messagesBatch,
 		}
 
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
