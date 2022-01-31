@@ -30,8 +30,6 @@ type ContactFieldValue struct {
 }
 
 type GetContactFieldValuesConfig struct {
-	Limit     *uint64
-	Offset    *uint64
 	ContactID *int64
 	FieldID   *int64
 	Value     *string
@@ -41,8 +39,6 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 	params := url.Values{}
 
 	fieldValues := ContactFieldValues{}
-	rowCount := uint64(0)
-	limit := defaultLimit
 
 	path := "fieldValues"
 
@@ -56,45 +52,17 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 		if getFieldValuesConfig.Value != nil {
 			params.Add("filters[val]", *getFieldValuesConfig.Value)
 		}
-		if getFieldValuesConfig.Limit != nil {
-			limit = *getFieldValuesConfig.Limit
-		}
-		if getFieldValuesConfig.Offset != nil {
-			service.nextOffsets.ContactFieldValue = *getFieldValuesConfig.Offset
-		}
 	}
 
-	params.Add("limit", fmt.Sprintf("%v", limit))
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
+		URL:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
+		ResponseModel: &fieldValues,
+	}
 
-	for {
-		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.ContactFieldValue))
-
-		fieldValuesBatch := ContactFieldValues{}
-
-		requestConfig := go_http.RequestConfig{
-			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
-			ResponseModel: &fieldValuesBatch,
-		}
-
-		_, _, e := service.httpRequest(&requestConfig)
-		if e != nil {
-			return nil, e
-		}
-
-		fieldValues.FieldValues = append(fieldValues.FieldValues, fieldValuesBatch.FieldValues...)
-
-		if len(fieldValuesBatch.FieldValues) < int(limit) {
-			service.nextOffsets.ContactFieldValue = 0
-			break
-		}
-
-		service.nextOffsets.ContactFieldValue += limit
-		rowCount += limit
-
-		if rowCount >= service.maxRowCount {
-			return &fieldValues, nil
-		}
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
 	}
 
 	return &fieldValues, nil
