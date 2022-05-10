@@ -67,9 +67,9 @@ type Campaign struct {
 	Facebook              go_types.BoolString             `json:"facebook"`
 	Survey                *go_types.String                `json:"survey"`
 	EmbedImages           go_types.BoolString             `json:"embed_images"`
-	HTMLUnsubscibe        go_types.BoolString             `json:"htmlunsub"`
+	HtmlUnsubscibe        go_types.BoolString             `json:"htmlunsub"`
 	TextUnsubscribe       go_types.BoolString             `json:"textunsub"`
-	HTMLUnsubscibeData    *go_types.String                `json:"htmlunsubdata"`
+	HtmlUnsubscibeData    *go_types.String                `json:"htmlunsubdata"`
 	TextUnsubscribeData   *go_types.String                `json:"textunsubdata"`
 	Recurring             *go_types.String                `json:"recurring"`
 	WillRecur             go_types.BoolString             `json:"willrecur"`
@@ -89,10 +89,10 @@ type Campaign struct {
 	ReminderOffsetType    *go_types.String                `json:"reminder_offset_type"`
 	ReminderOffsetSign    *go_types.String                `json:"reminder_offset_sign"`
 	ReminderLastCronRun   *a_types.DateTimeString         `json:"reminder_last_cron_run"`
-	ActiveRSSInterval     *go_types.String                `json:"activerss_interval"`
-	ActiveRSSUrl          *go_types.String                `json:"activerss_url"`
-	ActiveRSSItems        go_types.Int64String            `json:"activerss_items"`
-	IP4                   *go_types.Int64String           `json:"ip4"`
+	ActiveRssInterval     *go_types.String                `json:"activerss_interval"`
+	ActiveRssUrl          *go_types.String                `json:"activerss_url"`
+	ActiveRssItems        go_types.Int64String            `json:"activerss_items"`
+	Ip4                   *go_types.Int64String           `json:"ip4"`
 	LastStep              *go_types.String                `json:"laststep"`
 	ManageText            go_types.BoolString             `json:"managetext"`
 	Schedule              go_types.BoolString             `json:"schedule"`

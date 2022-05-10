@@ -28,12 +28,12 @@ type Contact struct {
 	Phone                *go_types.String                `json:"phone"`
 	FirstName            *go_types.String                `json:"firstName"`
 	LastName             *go_types.String                `json:"lastName"`
-	SegmentIOId          go_types.Int64String            `json:"segmentio_id"`
+	SegmentIoId          go_types.Int64String            `json:"segmentio_id"`
 	BouncedHard          go_types.Int64String            `json:"bounced_hard"`
 	BouncedSoft          go_types.Int64String            `json:"bounced_soft"`
 	BouncedDate          *a_types.DateString             `json:"bounced_date"`
-	IP                   *go_types.String                `json:"ip"`
-	UA                   *go_types.String                `json:"ua"`
+	Ip                   *go_types.String                `json:"ip"`
+	Ua                   *go_types.String                `json:"ua"`
 	Hash                 string                          `json:"hash"`
 	SocialdataLastcheck  a_types.DateTimeString          `json:"socialdata_lastcheck"`
 	EmailLocal           *go_types.String                `json:"email_local"`
@@ -47,8 +47,8 @@ type Contact struct {
 	UpdatedDate          a_types.DateTimeTimezoneString  `json:"udate"`
 	EDate                *a_types.DateTimeTimezoneString `json:"edate"`
 	DeletedDate          *a_types.DateTimeString         `json:"deleted_at"`
-	CreatedUTCTimestamp  a_types.DateTimeString          `json:"created_utc_timestamp"`
-	UpdatedUTCTimestamp  a_types.DateTimeString          `json:"updated_utc_timestamp"`
+	CreatedUtcTimestamp  a_types.DateTimeString          `json:"created_utc_timestamp"`
+	UpdatedUtcTimestamp  a_types.DateTimeString          `json:"updated_utc_timestamp"`
 	CreatedTimestamp     a_types.DateTimeString          `json:"created_timestamp"`
 	UpdatedTimestamp     a_types.DateTimeString          `json:"updated_timestamp"`
 	CreatedBy            *go_types.Int64String           `json:"created_by"`

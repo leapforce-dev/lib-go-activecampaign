@@ -33,8 +33,8 @@ type Message struct {
 	Subject       string                         `json:"subject"`
 	PreHeaderText string                         `json:"preheader_text"`
 	Text          string                         `json:"text"`
-	HTML          string                         `json:"html"`
-	HTMLFetch     string                         `json:"htmlfetch"`
+	Html          string                         `json:"html"`
+	HtmlFetch     string                         `json:"htmlfetch"`
 	TextFetch     string                         `json:"textfetch"`
 	Hidden        go_types.BoolString            `json:"hidden"`
 	PreviewMime   *go_types.String               `json:"preview_mime"`
