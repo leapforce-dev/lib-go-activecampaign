@@ -26,9 +26,9 @@ type DealGroup struct {
 	WinProbabilityInitializeDate *a_types.DateTimeString        `json:"win_probability_initialize_date"`
 	CreatedDate                  a_types.DateTimeTimezoneString `json:"cdate"`
 	UpdatedDate                  a_types.DateTimeTimezoneString `json:"udate"`
-	StageIDs                     *go_types.Int64Strings         `json:"stages"`
+	StageIds                     *go_types.Int64Strings         `json:"stages"`
 	Links                        *Links                         `json:"links"`
-	ID                           go_types.Int64String           `json:"id"`
+	Id                           go_types.Int64String           `json:"id"`
 	Stages                       *[]DealStage                   `json:"-"`
 }
 
@@ -81,7 +81,7 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("dealGroups?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("dealGroups?%s", params.Encode())),
 			ResponseModel: &dealGroupsBatch,
 		}
 
@@ -94,7 +94,7 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 			for i, dealGroup := range dealGroupsBatch.DealGroups {
 				var dealStages []DealStage
 				for _, dealStage := range *dealGroupsBatch.DealStages {
-					if dealGroup.ID == dealStage.GroupID {
+					if dealGroup.Id == dealStage.GroupId {
 						dealStages = append(dealStages, dealStage)
 					}
 				}

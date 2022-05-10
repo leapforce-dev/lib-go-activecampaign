@@ -18,17 +18,17 @@ type Campaigns struct {
 
 type Campaign struct {
 	Type                  string                          `json:"type"`
-	UserID                go_types.Int64String            `json:"userid"`
-	SegmentID             go_types.Int64String            `json:"segmentid"`
-	BounceID              go_types.Int64String            `json:"bounceid"`
-	RealcID               go_types.Int64String            `json:"realcid"`
-	SendID                go_types.Int64String            `json:"sendid"`
-	ThreadID              go_types.Int64String            `json:"threadid"`
-	SeriesID              go_types.Int64String            `json:"seriesid"`
-	FormID                go_types.Int64String            `json:"formid"`
-	BaseTemplateID        *go_types.String                `json:"basetemplateid"`
-	BaseMessageID         go_types.Int64String            `json:"basemessageid"`
-	AddressID             go_types.Int64String            `json:"addressid"`
+	UserId                go_types.Int64String            `json:"userid"`
+	SegmentId             go_types.Int64String            `json:"segmentid"`
+	BounceId              go_types.Int64String            `json:"bounceid"`
+	RealcId               go_types.Int64String            `json:"realcid"`
+	SendId                go_types.Int64String            `json:"sendid"`
+	ThreadId              go_types.Int64String            `json:"threadid"`
+	SeriesId              go_types.Int64String            `json:"seriesid"`
+	FormId                go_types.Int64String            `json:"formid"`
+	BaseTemplateId        *go_types.String                `json:"basetemplateid"`
+	BaseMessageId         go_types.Int64String            `json:"basemessageid"`
+	AddressId             go_types.Int64String            `json:"addressid"`
 	Source                string                          `json:"source"`
 	Name                  string                          `json:"name"`
 	CreatedDate           a_types.DateTimeTimezoneString  `json:"cdate"`
@@ -77,7 +77,7 @@ type Campaign struct {
 	SplitContent          go_types.BoolString             `json:"split_content"`
 	SplitOffset           go_types.Int64String            `json:"split_offset"`
 	SplitOffsetType       *go_types.String                `json:"split_offset_type"`
-	SplitWinnerMessageID  go_types.Int64String            `json:"split_winner_messageid"`
+	SplitWinnerMessageId  go_types.Int64String            `json:"split_winner_messageid"`
 	SplitWinnerAwaiting   go_types.BoolString             `json:"split_winner_awaiting"`
 	ResponderOffset       go_types.Int64String            `json:"responder_offset"`
 	ResponderType         *go_types.String                `json:"responder_type"`
@@ -90,7 +90,7 @@ type Campaign struct {
 	ReminderOffsetSign    *go_types.String                `json:"reminder_offset_sign"`
 	ReminderLastCronRun   *a_types.DateTimeString         `json:"reminder_last_cron_run"`
 	ActiveRSSInterval     *go_types.String                `json:"activerss_interval"`
-	ActiveRSSURL          *go_types.String                `json:"activerss_url"`
+	ActiveRSSUrl          *go_types.String                `json:"activerss_url"`
 	ActiveRSSItems        go_types.Int64String            `json:"activerss_items"`
 	IP4                   *go_types.Int64String           `json:"ip4"`
 	LastStep              *go_types.String                `json:"laststep"`
@@ -101,8 +101,8 @@ type Campaign struct {
 	DeleteStamp           *a_types.DateTimeString         `json:"deletestamp"`
 	ReplySys              go_types.BoolString             `json:"replysys"`
 	Links                 *Links                          `json:"links"`
-	ID                    go_types.Int64String            `json:"id"`
-	AutomationID          *go_types.Int64String           `json:"automation"`
+	Id                    go_types.Int64String            `json:"id"`
+	AutomationId          *go_types.Int64String           `json:"automation"`
 }
 
 type GetCampaignsConfig struct {
@@ -139,7 +139,7 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("campaigns?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("campaigns?%s", params.Encode())),
 			ResponseModel: &campaignsBatch,
 		}
 

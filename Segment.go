@@ -20,13 +20,13 @@ type Segment struct {
 	Name             string                 `json:"name"`
 	Logic            string                 `json:"logic"`
 	Hidden           go_types.BoolString    `json:"hidden"`
-	SeriesID         go_types.Int64String   `json:"seriesid"`
+	SeriesId         go_types.Int64String   `json:"seriesid"`
 	CreatedTimestamp a_types.DateTimeString `json:"created_timestamp"`
 	UpdatedTimestamp a_types.DateTimeString `json:"updated_timestamp"`
 	CreatedBy        *go_types.String       `json:"created_by"`
 	UpdatedBy        *go_types.String       `json:"updated_by"`
 	Links            *Links                 `json:"links"`
-	ID               go_types.Int64String   `json:"id"`
+	Id               go_types.Int64String   `json:"id"`
 }
 
 type GetSegmentsConfig struct {
@@ -59,7 +59,7 @@ func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segm
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("segments?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("segments?%s", params.Encode())),
 			ResponseModel: &segmentsBatch,
 		}
 

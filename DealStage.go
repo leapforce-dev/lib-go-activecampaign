@@ -17,7 +17,7 @@ type DealStages struct {
 }
 
 type DealStage struct {
-	GroupID     go_types.Int64String           `json:"group"`
+	GroupId     go_types.Int64String           `json:"group"`
 	Title       string                         `json:"title"`
 	Color       string                         `json:"color"`
 	Order       go_types.Int64String           `json:"order"`
@@ -31,14 +31,14 @@ type DealStage struct {
 	CreatedDate a_types.DateTimeTimezoneString `json:"cdate"`
 	UpdatedDate a_types.DateTimeTimezoneString `json:"udate"`
 	Links       *Links                         `json:"links"`
-	ID          go_types.Int64String           `json:"id"`
+	Id          go_types.Int64String           `json:"id"`
 }
 
 type GetDealStagesConfig struct {
 	Limit        *uint64
 	Offset       *uint64
 	Title        *string
-	GroupID      *int64
+	GroupId      *int64
 	OrderByTitle *OrderByDirection
 }
 
@@ -59,8 +59,8 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 		if getDealStagesConfig.Title != nil {
 			params.Add("filters[title]", *getDealStagesConfig.Title)
 		}
-		if getDealStagesConfig.GroupID != nil {
-			params.Add("filters[d_groupid]", fmt.Sprintf("%v", *getDealStagesConfig.GroupID))
+		if getDealStagesConfig.GroupId != nil {
+			params.Add("filters[d_groupid]", fmt.Sprintf("%v", *getDealStagesConfig.GroupId))
 		}
 		if getDealStagesConfig.OrderByTitle != nil {
 			params.Add("orders[title]", string(*getDealStagesConfig.OrderByTitle))
@@ -75,7 +75,7 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("dealStages?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("dealStages?%s", params.Encode())),
 			ResponseModel: &dealStagesBatch,
 		}
 

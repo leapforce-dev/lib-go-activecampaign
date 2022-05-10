@@ -19,24 +19,24 @@ type ContactFields struct {
 }
 
 type ContactFieldOption struct {
-	FieldID     go_types.Int64String           `json:"field"`
-	OrderID     go_types.Int64String           `json:"orderid"`
+	FieldId     go_types.Int64String           `json:"field"`
+	OrderId     go_types.Int64String           `json:"orderid"`
 	Value       string                         `json:"value"`
 	Label       string                         `json:"label"`
 	IsDefault   go_types.BoolString            `json:"isdefault"`
 	CreatedDate a_types.DateTimeTimezoneString `json:"cdate"`
 	UpdatedDate a_types.DateTimeTimezoneString `json:"udate"`
 	Links       *Links                         `json:"links"`
-	ID          go_types.Int64String           `json:"id"`
+	Id          go_types.Int64String           `json:"id"`
 }
 
 type ContactFieldRelation struct {
-	FieldID      go_types.Int64String           `json:"field"`
-	RelationID   go_types.Int64String           `json:"relid"`
+	FieldId      go_types.Int64String           `json:"field"`
+	RelationId   go_types.Int64String           `json:"relid"`
 	DisplayOrder go_types.Int64String           `json:"dorder"`
 	CreatedDate  a_types.DateTimeTimezoneString `json:"cdate"`
 	Links        *Links                         `json:"links"`
-	ID           go_types.Int64String           `json:"id"`
+	Id           go_types.Int64String           `json:"id"`
 }
 
 type ContactField struct {
@@ -57,7 +57,7 @@ type ContactField struct {
 	Options            []go_types.Int64String         `json:"options"`
 	Relations          []go_types.Int64String         `json:"relations"`
 	Links              *Links                         `json:"links"`
-	ID                 go_types.Int64String           `json:"id"`
+	Id                 go_types.Int64String           `json:"id"`
 }
 
 type GetContactFieldsConfig struct {
@@ -90,7 +90,7 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("fields?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("fields?%s", params.Encode())),
 			ResponseModel: &contactFieldsBatch,
 		}
 

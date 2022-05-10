@@ -18,8 +18,8 @@ type Lists struct {
 }
 
 type List struct {
-	StringID             string                         `json:"stringid"`
-	UserID               go_types.Int64String           `json:"userid"`
+	StringId             string                         `json:"stringid"`
+	UserId               go_types.Int64String           `json:"userid"`
 	Name                 string                         `json:"name"`
 	CreatedDate          a_types.DateTimeTimezoneString `json:"cdate"`
 	UseTracking          go_types.BoolString            `json:"p_use_tracking"`
@@ -52,10 +52,10 @@ type List struct {
 	SenderZip            *go_types.String               `json:"sender_zip"`
 	SenderCountry        *go_types.String               `json:"sender_country"`
 	SenderPhone          *go_types.String               `json:"sender_phone"`
-	SenderURL            *go_types.String               `json:"sender_url"`
+	SenderUrl            *go_types.String               `json:"sender_url"`
 	SenderReminder       *go_types.String               `json:"sender_reminder"`
 	FullAddress          *go_types.String               `json:"fulladdress"`
-	OptInMessageID       *go_types.Int64String          `json:"optinmessageid"`
+	OptInMessageId       *go_types.Int64String          `json:"optinmessageid"`
 	OptOutConf           *go_types.Int64String          `json:"optoutconf"`
 	DeleteStamp          json.RawMessage                `json:"deletestamp"`
 	UpdatedDate          *a_types.DateTimeString        `json:"udate"`
@@ -64,7 +64,7 @@ type List struct {
 	CreatedBy            *go_types.Int64String          `json:"created_by"`
 	UpdatedBy            *go_types.Int64String          `json:"updated_by"`
 	Links                *Links                         `json:"links"`
-	ID                   go_types.Int64String           `json:"id"`
+	Id                   go_types.Int64String           `json:"id"`
 }
 
 type GetListsConfig struct {
@@ -100,7 +100,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("lists?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("lists?%s", params.Encode())),
 			ResponseModel: &listsBatch,
 		}
 

@@ -62,7 +62,7 @@ func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) 
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("dealCustomFieldMeta?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("dealCustomFieldMeta?%s", params.Encode())),
 			ResponseModel: &dealFieldsBatch,
 		}
 

@@ -20,13 +20,13 @@ type Automation struct {
 	Name              string                         `json:"name"`
 	CreatedDate       a_types.DateTimeTimezoneString `json:"cdate"`
 	ModifiedDate      a_types.DateTimeTimezoneString `json:"mdate"`
-	UserID            go_types.Int64String           `json:"userid"`
+	UserId            go_types.Int64String           `json:"userid"`
 	Status            go_types.Int64String           `json:"status"`
 	Entered           go_types.Int64String           `json:"entered"`
 	Exited            go_types.Int64String           `json:"exited"`
 	Hidden            go_types.Int64String           `json:"hidden"`
 	DefaultScreenshot *go_types.String               `json:"defaultscreenshot"`
-	ID                go_types.Int64String           `json:"id"`
+	Id                go_types.Int64String           `json:"id"`
 	Links             *Links                         `json:"links"`
 }
 
@@ -60,7 +60,7 @@ func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfi
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("automations?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("automations?%s", params.Encode())),
 			ResponseModel: &automationsBatch,
 		}
 

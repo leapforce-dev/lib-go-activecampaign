@@ -21,32 +21,32 @@ type Deals struct {
 
 type Deal struct {
 	Hash                       string                          `json:"hash"`
-	OwnerID                    go_types.Int64String            `json:"owner"`
-	ContactID                  go_types.Int64String            `json:"contact"`
-	OrganizationID             *go_types.Int64String           `json:"organization"`
-	GroupID                    go_types.Int64String            `json:"group"`
-	StageID                    go_types.Int64String            `json:"stage"`
+	OwnerId                    go_types.Int64String            `json:"owner"`
+	ContactId                  go_types.Int64String            `json:"contact"`
+	OrganizationId             *go_types.Int64String           `json:"organization"`
+	GroupId                    go_types.Int64String            `json:"group"`
+	StageId                    go_types.Int64String            `json:"stage"`
 	Title                      string                          `json:"title"`
 	Description                string                          `json:"description"`
 	Percent                    go_types.Int64String            `json:"percent"`
 	CreatedDate                a_types.DateTimeTimezoneString  `json:"cdate"`
 	ModifiedDate               a_types.DateTimeTimezoneString  `json:"mdate"`
 	NextDate                   *a_types.DateTimeTimezoneString `json:"nextdate"`
-	NextTaskID                 *go_types.Int64String           `json:"nexttaskid"`
+	NextTaskId                 *go_types.Int64String           `json:"nexttaskid"`
 	Value                      go_types.Int64String            `json:"value"`
 	Currency                   string                          `json:"currency"`
 	WinProbability             *int64                          `json:"winProbability"`
 	WinProbabilityModifiedDate *a_types.DateTimeTimezoneString `json:"winProbabilityMdate"`
 	Status                     go_types.Int64String            `json:"status"`
 	ActivityCount              go_types.Int64String            `json:"activitycount"`
-	NextDealID                 *go_types.Int64String           `json:"nextdealid"`
+	NextDealId                 *go_types.Int64String           `json:"nextdealid"`
 	EDate                      *a_types.DateTimeString         `json:"edate"`
-	FieldValueIDs              *go_types.Int64Strings          `json:"dealCustomFieldData"`
+	FieldValueIds              *go_types.Int64Strings          `json:"dealCustomFieldData"`
 	Links                      *Links                          `json:"links"`
-	ID                         go_types.Int64String            `json:"id"`
+	Id                         go_types.Int64String            `json:"id"`
 	IsDisabled                 bool                            `json:"isDisabled"`
-	AccountID                  *go_types.Int64String           `json:"account"`
-	CustomerAccountID          *go_types.Int64String           `json:"customerAccount"`
+	AccountId                  *go_types.Int64String           `json:"account"`
+	CustomerAccountId          *go_types.Int64String           `json:"customerAccount"`
 	FieldValues                *[]DealFieldValue               `json:"-"`
 }
 
@@ -102,7 +102,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("deals?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("deals?%s", params.Encode())),
 			ResponseModel: &dealsBatch,
 		}
 
@@ -115,7 +115,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 			for i, deal := range dealsBatch.Deals {
 				var fieldValues []DealFieldValue
 				for _, fieldValue := range *dealsBatch.FieldValues {
-					if deal.ID == fieldValue.DealID {
+					if deal.Id == fieldValue.DealId {
 						fieldValues = append(fieldValues, fieldValue)
 					}
 				}

@@ -28,7 +28,7 @@ type Contact struct {
 	Phone                *go_types.String                `json:"phone"`
 	FirstName            *go_types.String                `json:"firstName"`
 	LastName             *go_types.String                `json:"lastName"`
-	SegmentIOID          go_types.Int64String            `json:"segmentio_id"`
+	SegmentIOId          go_types.Int64String            `json:"segmentio_id"`
 	BouncedHard          go_types.Int64String            `json:"bounced_hard"`
 	BouncedSoft          go_types.Int64String            `json:"bounced_soft"`
 	BouncedDate          *a_types.DateString             `json:"bounced_date"`
@@ -56,13 +56,13 @@ type Contact struct {
 	EmailEmpty           bool                            `json:"email_empty"`
 	ScoreValues          *go_types.Int64Strings          `json:"scoreValues"`
 	AccountContacts      *go_types.Int64Strings          `json:"accountContacts"`
-	ContactAutomationIDs *go_types.Int64Strings          `json:"contactAutomations"`
-	ContactListIDs       *go_types.Int64Strings          `json:"contactLists"`
-	ContactTagIDs        *go_types.Int64Strings          `json:"contactTags"`
-	FieldValueIDs        *go_types.Int64Strings          `json:"fieldValues"`
+	ContactAutomationIds *go_types.Int64Strings          `json:"contactAutomations"`
+	ContactListIds       *go_types.Int64Strings          `json:"contactLists"`
+	ContactTagIds        *go_types.Int64Strings          `json:"contactTags"`
+	FieldValueIds        *go_types.Int64Strings          `json:"fieldValues"`
 	Links                *Links                          `json:"links"`
-	ID                   go_types.Int64String            `json:"id"`
-	OrganizationID       *go_types.Int64String           `json:"organization"`
+	Id                   go_types.Int64String            `json:"id"`
+	OrganizationId       *go_types.Int64String           `json:"organization"`
 	ContactAutomations   *[]ContactAutomation            `json:"-"`
 	ContactLists         *[]ContactList                  `json:"-"`
 	ContactTags          *[]ContactTag                   `json:"-"`
@@ -90,7 +90,7 @@ type GetContactsConfig struct {
 	Limit        *uint64
 	Offset       *uint64
 	Email        *string
-	ListID       *int64
+	ListId       *int64
 	CreatedAfter *time.Time
 	UpdatedAfter *time.Time
 	Include      *[]ContactInclude
@@ -113,8 +113,8 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		if getContactsConfig.Email != nil {
 			params.Add("email", *getContactsConfig.Email)
 		}
-		if getContactsConfig.ListID != nil {
-			params.Add("listid", fmt.Sprintf("%v", *getContactsConfig.ListID))
+		if getContactsConfig.ListId != nil {
+			params.Add("listid", fmt.Sprintf("%v", *getContactsConfig.ListId))
 		}
 		if getContactsConfig.CreatedAfter != nil {
 			params.Add("filters[created_after]", (*getContactsConfig.CreatedAfter).Format(timestampLayout))
@@ -140,7 +140,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("contacts?%s", params.Encode())),
 			ResponseModel: &contactsBatch,
 		}
 
@@ -153,7 +153,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			for i, contact := range contactsBatch.Contacts {
 				var contactAutomations []ContactAutomation
 				for _, contactAutomation := range *contactsBatch.ContactAutomations {
-					if contact.ID == contactAutomation.ContactID {
+					if contact.Id == contactAutomation.ContactId {
 						contactAutomations = append(contactAutomations, contactAutomation)
 					}
 				}
@@ -165,7 +165,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			for i, contact := range contactsBatch.Contacts {
 				var contactLists []ContactList
 				for _, contactList := range *contactsBatch.ContactLists {
-					if contact.ID == contactList.ContactID {
+					if contact.Id == contactList.ContactId {
 						contactLists = append(contactLists, contactList)
 					}
 				}
@@ -177,7 +177,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			for i, contact := range contactsBatch.Contacts {
 				var contactTags []ContactTag
 				for _, contactTag := range *contactsBatch.ContactTags {
-					if contact.ID == contactTag.ContactID {
+					if contact.Id == contactTag.ContactId {
 						contactTags = append(contactTags, contactTag)
 					}
 				}
@@ -189,7 +189,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 			for i, contact := range contactsBatch.Contacts {
 				var fieldValues []ContactFieldValue
 				for _, fieldValue := range *contactsBatch.FieldValues {
-					if contact.ID == fieldValue.ContactID {
+					if contact.Id == fieldValue.ContactId {
 						fieldValues = append(fieldValues, fieldValue)
 					}
 				}
@@ -231,7 +231,7 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodPost,
-		URL:           service.url("contact/sync"),
+		Url:           service.url("contact/sync"),
 		BodyModel:     d,
 		ResponseModel: &contactCreated,
 	}
@@ -249,7 +249,7 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 	return &contactCreated.Contact, nil
 }
 
-func (service *Service) UpdateContact(contactID string, contactCreate ContactSync) (*Contact, *errortools.Error) {
+func (service *Service) UpdateContact(contactId string, contactCreate ContactSync) (*Contact, *errortools.Error) {
 	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
@@ -262,7 +262,7 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodPost,
-		URL:           service.url(fmt.Sprintf("contacts/%s", contactID)),
+		Url:           service.url(fmt.Sprintf("contacts/%s", contactId)),
 		BodyModel:     d,
 		ResponseModel: &contactUpdated,
 	}
@@ -275,10 +275,10 @@ func (service *Service) UpdateContact(contactID string, contactCreate ContactSyn
 	return &contactUpdated.Contact, nil
 }
 
-func (service *Service) DeleteContact(contactID int64) *errortools.Error {
+func (service *Service) DeleteContact(contactId int64) *errortools.Error {
 	requestConfig := go_http.RequestConfig{
 		Method: http.MethodDelete,
-		URL:    service.url(fmt.Sprintf("contacts/%v", contactID)),
+		Url:    service.url(fmt.Sprintf("contacts/%v", contactId)),
 	}
 
 	_, _, e := service.httpRequest(&requestConfig)

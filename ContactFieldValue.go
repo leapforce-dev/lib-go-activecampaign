@@ -17,21 +17,21 @@ type ContactFieldValues struct {
 }
 
 type ContactFieldValue struct {
-	ContactID   go_types.Int64String           `json:"contact"`
-	FieldID     go_types.Int64String           `json:"field"`
+	ContactId   go_types.Int64String           `json:"contact"`
+	FieldId     go_types.Int64String           `json:"field"`
 	Value       string                         `json:"value"`
 	CreatedDate a_types.DateTimeTimezoneString `json:"cdate,omitempty"`
 	UpdatedDate a_types.DateTimeTimezoneString `json:"udate,omitempty"`
 	CreatedBy   *go_types.String               `json:"created_by,omitempty"`
 	UpdatedBy   *go_types.String               `json:"updated_by,omitempty"`
-	ID          go_types.Int64String           `json:"id,omitempty"`
-	OwnerID     go_types.Int64String           `json:"owner,omitempty"`
+	Id          go_types.Int64String           `json:"id,omitempty"`
+	OwnerId     go_types.Int64String           `json:"owner,omitempty"`
 	Links       *Links                         `json:"links,omitempty"`
 }
 
 type GetContactFieldValuesConfig struct {
-	ContactID *int64
-	FieldID   *int64
+	ContactId *int64
+	FieldId   *int64
 	Value     *string
 }
 
@@ -43,11 +43,11 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 	path := "fieldValues"
 
 	if getFieldValuesConfig != nil {
-		if getFieldValuesConfig.ContactID != nil {
-			path = fmt.Sprintf("contacts/%v/fieldValues", *getFieldValuesConfig.ContactID)
+		if getFieldValuesConfig.ContactId != nil {
+			path = fmt.Sprintf("contacts/%v/fieldValues", *getFieldValuesConfig.ContactId)
 		}
-		if getFieldValuesConfig.FieldID != nil {
-			params.Add("filters[fieldid]", fmt.Sprintf("%v", *getFieldValuesConfig.FieldID))
+		if getFieldValuesConfig.FieldId != nil {
+			params.Add("filters[fieldid]", fmt.Sprintf("%v", *getFieldValuesConfig.FieldId))
 		}
 		if getFieldValuesConfig.Value != nil {
 			params.Add("filters[val]", *getFieldValuesConfig.Value)
@@ -56,7 +56,7 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
-		URL:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
+		Url:           service.url(fmt.Sprintf("%s?%s", path, params.Encode())),
 		ResponseModel: &fieldValues,
 	}
 

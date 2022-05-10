@@ -41,7 +41,7 @@ type Service struct {
 
 type ServiceConfig struct {
 	Host        string
-	APIKey      string
+	ApiKey      string
 	MaxRowCount *uint64
 }
 
@@ -50,8 +50,8 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 		return nil, errortools.ErrorMessage("Host not provided")
 	}
 
-	if serviceConfig.APIKey == "" {
-		return nil, errortools.ErrorMessage("APIKey not provided")
+	if serviceConfig.ApiKey == "" {
+		return nil, errortools.ErrorMessage("ApiKey not provided")
 	}
 
 	httpService, e := go_http.NewService(&go_http.ServiceConfig{})
@@ -65,7 +65,7 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 	}
 	return &Service{
 		host:        serviceConfig.Host,
-		apiKey:      serviceConfig.APIKey,
+		apiKey:      serviceConfig.ApiKey,
 		maxRowCount: maxRowCount,
 		httpService: httpService,
 	}, nil
@@ -81,7 +81,7 @@ func (service *Service) httpRequest(requestConfig *go_http.RequestConfig) (*http
 	errorResponse := ErrorResponse{}
 	(*requestConfig).ErrorModel = &errorResponse
 
-	request, response, e := service.httpService.HTTPRequest(requestConfig)
+	request, response, e := service.httpService.HttpRequest(requestConfig)
 	if len(errorResponse.Errors) > 0 {
 		e.SetMessage(errorResponse.Errors[0].Title)
 	}
@@ -101,18 +101,18 @@ func (service *Service) url(path string) string {
 	return fmt.Sprintf("https://%s/api/3/%s", service.host, path)
 }
 
-func (service Service) APIName() string {
+func (service Service) ApiName() string {
 	return apiName
 }
 
-func (service Service) APIKey() string {
+func (service Service) ApiKey() string {
 	return service.apiKey
 }
 
-func (service Service) APICallCount() int64 {
+func (service Service) ApiCallCount() int64 {
 	return service.httpService.RequestCount()
 }
 
-func (service Service) APIReset() {
+func (service Service) ApiReset() {
 	service.httpService.ResetRequestCount()
 }

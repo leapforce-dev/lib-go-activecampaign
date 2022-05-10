@@ -26,7 +26,7 @@ type Tag struct {
 	UpdatedTimestamp a_types.DateTimeString         `json:"updated_timestamp"`
 	CreatedBy        *go_types.Int64String          `json:"created_by"`
 	UpdatedBy        *go_types.Int64String          `json:"updated_by"`
-	ID               go_types.Int64String           `json:"id"`
+	Id               go_types.Int64String           `json:"id"`
 	Links            *Links                         `json:"links"`
 }
 
@@ -64,7 +64,7 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("tags?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("tags?%s", params.Encode())),
 			ResponseModel: &tagsBatch,
 		}
 

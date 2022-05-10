@@ -17,8 +17,8 @@ type Messages struct {
 }
 
 type Message struct {
-	UserID        go_types.Int64String           `json:"userid"`
-	EdInstanceID  go_types.Int64String           `json:"ed_instanceid"`
+	UserId        go_types.Int64String           `json:"userid"`
+	EdInstanceId  go_types.Int64String           `json:"ed_instanceid"`
 	EdVersion     go_types.Int64String           `json:"ed_version"`
 	CreatedDate   a_types.DateTimeTimezoneString `json:"cdate"`
 	ModifiedDate  a_types.DateTimeTimezoneString `json:"mdate"`
@@ -40,7 +40,7 @@ type Message struct {
 	PreviewMime   *go_types.String               `json:"preview_mime"`
 	PreviewData   *go_types.String               `json:"preview_data"`
 	Links         *Links                         `json:"links"`
-	ID            go_types.Int64String           `json:"id"`
+	Id            go_types.Int64String           `json:"id"`
 }
 
 type GetMessagesConfig struct {
@@ -73,7 +73,7 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.url(fmt.Sprintf("messages?%s", params.Encode())),
+			Url:           service.url(fmt.Sprintf("messages?%s", params.Encode())),
 			ResponseModel: &messagesBatch,
 		}
 

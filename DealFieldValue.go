@@ -11,8 +11,8 @@ type DealFieldValues struct {
 }
 
 type DealFieldValue struct {
-	DealID               go_types.Int64String    `json:"deal_id"`
-	FieldID              go_types.Int64String    `json:"custom_field_id"`
+	DealId               go_types.Int64String    `json:"deal_id"`
+	FieldId              go_types.Int64String    `json:"custom_field_id"`
 	TextValue            *go_types.String        `json:"custom_field_text_value"`
 	TextBlob             *go_types.String        `json:"custom_field_text_blob"`
 	DateValue            *a_types.DateTimeString `json:"custom_field_date_value"`
@@ -24,6 +24,6 @@ type DealFieldValue struct {
 	CreatedBy            *go_types.String        `json:"created_by"`
 	UpdatedBy            *go_types.String        `json:"updated_by"`
 	Links                *Links                  `json:"links"`
-	ID                   go_types.Int64String    `json:"id"`
+	Id                   go_types.Int64String    `json:"id"`
 	DealCustomFieldMetum go_types.Int64String    `json:"dealCustomFieldMetum"`
 }

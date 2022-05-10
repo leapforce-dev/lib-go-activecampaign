@@ -16,9 +16,9 @@ type CustomObjectRecord struct {
 }
 
 type CustomObjectRecordRecord struct {
-	SchemaID      string                          `json:"schemaId"`
-	ID            *string                         `json:"id"`
-	ExternalID    *string                         `json:"externalId"`
+	SchemaId      string                          `json:"schemaId"`
+	Id            *string                         `json:"id"`
+	ExternalId    *string                         `json:"externalId"`
 	Fields        []CustomObjectRecordField       `json:"fields"`
 	Relationships CustomObjectRecordRelationships `json:"relationships"`
 }
@@ -28,7 +28,7 @@ type CustomObjectRecordRelationships struct {
 }
 
 type CustomObjectRecordField struct {
-	ID    string      `json:"id"`
+	Id    string      `json:"id"`
 	Value interface{} `json:"value"`
 }
 
@@ -41,7 +41,7 @@ func (service *Service) CreateCustomObjectRecord(r *CustomObjectRecord) (*Custom
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodPost,
-		URL:           service.url(fmt.Sprintf("customObjects/records/%s", r.Record.SchemaID)),
+		Url:           service.url(fmt.Sprintf("customObjects/records/%s", r.Record.SchemaId)),
 		BodyModel:     r,
 		ResponseModel: &customObjectRecord,
 	}
@@ -54,14 +54,14 @@ func (service *Service) CreateCustomObjectRecord(r *CustomObjectRecord) (*Custom
 	return &customObjectRecord, nil
 }
 
-func (service *Service) DeleteCustomObjectRecordByExternalID(schemaID string, externalID string) *errortools.Error {
-	if externalID == "" {
-		return errortools.ErrorMessage("externalID is empty")
+func (service *Service) DeleteCustomObjectRecordByExternalId(schemaId string, externalId string) *errortools.Error {
+	if externalId == "" {
+		return errortools.ErrorMessage("externalId is empty")
 	}
 
 	requestConfig := go_http.RequestConfig{
 		Method: http.MethodDelete,
-		URL:    service.url(fmt.Sprintf("customObjects/records/%s/external/%s", schemaID, externalID)),
+		Url:    service.url(fmt.Sprintf("customObjects/records/%s/external/%s", schemaId, externalId)),
 	}
 
 	_, _, e := service.httpRequest(&requestConfig)
