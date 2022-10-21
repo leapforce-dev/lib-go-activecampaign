@@ -13,7 +13,7 @@ import (
 	go_types "github.com/leapforce-libraries/go_types"
 )
 
-type Contacts struct {
+type ContactsResponse struct {
 	ContactAutomations *[]ContactAutomation `json:"contactAutomations"`
 	ContactLists       *[]ContactList       `json:"contactLists"`
 	ContactTags        *[]ContactTag        `json:"contactTags"`
@@ -96,10 +96,10 @@ type GetContactsConfig struct {
 	Include      *[]ContactInclude
 }
 
-func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Contacts, *errortools.Error) {
+func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*ContactsResponse, *errortools.Error) {
 	params := url.Values{}
 
-	contacts := Contacts{}
+	contacts := ContactsResponse{}
 	rowCount := uint64(0)
 	limit := defaultLimit
 
@@ -136,7 +136,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	for {
 		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.Contact))
 
-		contactsBatch := Contacts{}
+		contactsBatch := ContactsResponse{}
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
@@ -212,6 +212,34 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 	}
 
 	return &contacts, nil
+}
+
+type ContactResponse struct {
+	ContactAutomations *[]ContactAutomation         `json:"contactAutomations"`
+	ContactLists       *[]ContactList               `json:"contactLists"`
+	Deals              *[]Deal                      `json:"deals"`
+	FieldValues        *[]ContactFieldValue         `json:"fieldValues"`
+	GeoIps             *[]string                    `json:"geoIps"`
+	Accounts           *[]Account                   `json:"accounts"`
+	AccountContacts    *[]AccountContactAssociation `json:"accountContacts"`
+	Contact            Contact                      `json:"contact"`
+}
+
+func (service *Service) GetContact(contactId int64) (*ContactResponse, *errortools.Error) {
+	contactResponse := ContactResponse{}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
+		Url:           service.url(fmt.Sprintf("contacts/%v", contactId)),
+		ResponseModel: &contactResponse,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &contactResponse, nil
 }
 
 func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *errortools.Error) {

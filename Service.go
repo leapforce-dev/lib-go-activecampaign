@@ -21,21 +21,25 @@ type Service struct {
 	maxRowCount uint64
 	httpService *go_http.Service
 	nextOffsets struct {
-		Automation        uint64
-		Campaign          uint64
-		Contact           uint64
-		ContactAutomation uint64
-		ContactField      uint64
-		ContactFieldValue uint64
-		ContactTag        uint64
-		Deal              uint64
-		DealField         uint64
-		DealGroup         uint64
-		DealStage         uint64
-		List              uint64
-		Message           uint64
-		Segment           uint64
-		Tag               uint64
+		Account                   uint64
+		AccountCustomField        uint64
+		AccountFieldValue         uint64
+		AccountContactAssociation uint64
+		Automation                uint64
+		Campaign                  uint64
+		Contact                   uint64
+		ContactAutomation         uint64
+		ContactField              uint64
+		ContactFieldValue         uint64
+		ContactTag                uint64
+		Deal                      uint64
+		DealField                 uint64
+		DealGroup                 uint64
+		DealStage                 uint64
+		List                      uint64
+		Message                   uint64
+		Segment                   uint64
+		Tag                       uint64
 	}
 }
 
