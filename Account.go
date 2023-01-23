@@ -98,11 +98,15 @@ type AccountSync struct {
 	FieldValues *[]AccountFieldValue `json:"fields,omitempty"`
 }
 
-func (service *Service) UpdateAccount(accountId string, accountCreate AccountSync) (*Account, *errortools.Error) {
+func (service *Service) UpdateAccount(accountId string, accountUpdate *AccountSync) (*Account, *errortools.Error) {
+	if accountUpdate == nil {
+		return nil, nil
+	}
+
 	d := struct {
 		Account AccountSync `json:"account"`
 	}{
-		Account: accountCreate,
+		Account: *accountUpdate,
 	}
 
 	var accountUpdated struct {
@@ -110,7 +114,7 @@ func (service *Service) UpdateAccount(accountId string, accountCreate AccountSyn
 	}
 
 	requestConfig := go_http.RequestConfig{
-		Method:        http.MethodPost,
+		Method:        http.MethodPut,
 		Url:           service.url(fmt.Sprintf("accounts/%s", accountId)),
 		BodyModel:     d,
 		ResponseModel: &accountUpdated,
@@ -122,6 +126,36 @@ func (service *Service) UpdateAccount(accountId string, accountCreate AccountSyn
 	}
 
 	return &accountUpdated.Account, nil
+}
+
+func (service *Service) CreateAccount(accountCreate *AccountSync) (*Account, *errortools.Error) {
+	if accountCreate == nil {
+		return nil, nil
+	}
+
+	d := struct {
+		Account AccountSync `json:"account"`
+	}{
+		Account: *accountCreate,
+	}
+
+	var accountCreated struct {
+		Account Account `json:"account"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
+		Url:           service.url("accounts"),
+		BodyModel:     d,
+		ResponseModel: &accountCreated,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &accountCreated.Account, nil
 }
 
 func (service *Service) DeleteAccount(accountId int64) *errortools.Error {
