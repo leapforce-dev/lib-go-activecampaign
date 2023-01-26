@@ -1,9 +1,10 @@
 package activecampaign
 
-// ErrorResponse stores general Elfsquad error response
+// ErrorResponse stores general ActiveCampaign error response
 //
 type ErrorResponse struct {
-	Errors []struct {
+	Message string `json:"message"`
+	Errors  []struct {
 		Title  string `json:"title"`
 		Detail string `json:"detail"`
 		Code   string `json:"code"`
@@ -12,4 +13,5 @@ type ErrorResponse struct {
 			Pointer string `json:"pointer"`
 		} `json:"source"`
 	} `json:"errors"`
+	StatusCode int
 }

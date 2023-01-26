@@ -22,7 +22,7 @@ type Service struct {
 	httpService *go_http.Service
 	nextOffsets struct {
 		Account                   uint64
-		AccountCustomField        uint64
+		AccountField              uint64
 		AccountFieldValue         uint64
 		AccountContactAssociation uint64
 		Automation                uint64
@@ -41,6 +41,7 @@ type Service struct {
 		Segment                   uint64
 		Tag                       uint64
 	}
+	errorResponse *ErrorResponse
 }
 
 type ServiceConfig struct {
@@ -82,12 +83,16 @@ func (service *Service) httpRequest(requestConfig *go_http.RequestConfig) (*http
 	(*requestConfig).NonDefaultHeaders = &header
 
 	// add error model
-	errorResponse := ErrorResponse{}
-	(*requestConfig).ErrorModel = &errorResponse
+
+	service.errorResponse = &ErrorResponse{}
+	(*requestConfig).ErrorModel = service.errorResponse
 
 	request, response, e := service.httpService.HttpRequest(requestConfig)
-	if len(errorResponse.Errors) > 0 {
-		e.SetMessage(errorResponse.Errors[0].Title)
+	service.errorResponse.StatusCode = response.StatusCode
+	if service.errorResponse.Message != "" {
+		e.SetMessage(service.errorResponse.Message)
+	} else if len(service.errorResponse.Errors) > 0 {
+		e.SetMessage(service.errorResponse.Errors[0].Title)
 	}
 
 	// activecampaign sometimes returns an error while the action has succesfully been performed
@@ -119,4 +124,8 @@ func (service Service) ApiCallCount() int64 {
 
 func (service Service) ApiReset() {
 	service.httpService.ResetRequestCount()
+}
+
+func (service *Service) ErrorResponse() *ErrorResponse {
+	return service.errorResponse
 }

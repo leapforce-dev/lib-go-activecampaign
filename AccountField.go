@@ -10,12 +10,12 @@ import (
 	"net/url"
 )
 
-type AccountCustomFields struct {
-	AccountCustomFields []AccountCustomField `json:"accountCustomFieldMeta"`
-	Meta                Meta                 `json:"meta"`
+type AccountFields struct {
+	AccountFields []AccountField `json:"accountCustomFieldMeta"`
+	Meta          Meta           `json:"meta"`
 }
 
-type AccountCustomField struct {
+type AccountField struct {
 	Id                   go_types.Int64String   `json:"id"`
 	FieldLabel           string                 `json:"fieldLabel"`
 	FieldType            string                 `json:"fieldType"`
@@ -33,34 +33,34 @@ type AccountCustomField struct {
 	Links                *Links                 `json:"links"`
 }
 
-type GetAccountCustomFieldsConfig struct {
+type GetAccountFieldsConfig struct {
 	Limit  *uint64
 	Offset *uint64
 }
 
-func (service *Service) GetAccountCustomFields(getAccountCustomFieldsConfig *GetAccountCustomFieldsConfig) (*AccountCustomFields, *errortools.Error) {
+func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountFieldsConfig) (*AccountFields, *errortools.Error) {
 	params := url.Values{}
 
-	accountCustomFields := AccountCustomFields{}
+	accountFields := AccountFields{}
 	rowCount := uint64(0)
 	limit := defaultLimit
 
-	if getAccountCustomFieldsConfig != nil {
-		if getAccountCustomFieldsConfig.Limit != nil {
-			limit = *getAccountCustomFieldsConfig.Limit
+	if getAccountFieldsConfig != nil {
+		if getAccountFieldsConfig.Limit != nil {
+			limit = *getAccountFieldsConfig.Limit
 		}
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
 
 	for {
-		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.AccountCustomField))
+		params.Set("offset", fmt.Sprintf("%v", service.nextOffsets.AccountField))
 
-		accountCustomFieldsBatch := AccountCustomFields{}
+		accountFieldsBatch := AccountFields{}
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
 			Url:           service.url(fmt.Sprintf("accountCustomFieldMeta?%s", params.Encode())),
-			ResponseModel: &accountCustomFieldsBatch,
+			ResponseModel: &accountFieldsBatch,
 		}
 
 		_, _, e := service.httpRequest(&requestConfig)
@@ -68,20 +68,20 @@ func (service *Service) GetAccountCustomFields(getAccountCustomFieldsConfig *Get
 			return nil, e
 		}
 
-		accountCustomFields.AccountCustomFields = append(accountCustomFields.AccountCustomFields, accountCustomFieldsBatch.AccountCustomFields...)
+		accountFields.AccountFields = append(accountFields.AccountFields, accountFieldsBatch.AccountFields...)
 
-		if len(accountCustomFieldsBatch.AccountCustomFields) < int(limit) {
-			service.nextOffsets.AccountCustomField = 0
+		if len(accountFieldsBatch.AccountFields) < int(limit) {
+			service.nextOffsets.AccountField = 0
 			break
 		}
 
-		service.nextOffsets.AccountCustomField += limit
+		service.nextOffsets.AccountField += limit
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &accountCustomFields, nil
+			return &accountFields, nil
 		}
 	}
 
-	return &accountCustomFields, nil
+	return &accountFields, nil
 }

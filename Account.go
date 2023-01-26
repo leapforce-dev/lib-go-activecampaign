@@ -22,7 +22,7 @@ type Account struct {
 	UpdatedUtcTimestamp a_types.DateTimeString `json:"updated_utc_timestamp"`
 	ContactCount        go_types.Int64String   `json:"contactCount"`
 	DealCount           go_types.Int64String   `json:"dealCount"`
-	Owner               *go_types.Int64String  `json:"owner"`
+	Owner               *a_types.Int64String   `json:"owner"`
 	Id                  go_types.Int64String   `json:"id"`
 	Links               *Links                 `json:"links"`
 }

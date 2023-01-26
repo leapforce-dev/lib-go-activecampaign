@@ -1,4 +1,4 @@
-package facebook
+package activecampaign
 
 import (
 	"encoding/json"

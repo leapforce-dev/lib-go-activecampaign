@@ -15,11 +15,11 @@ type AccountContactAssociations struct {
 }
 
 type AccountContactAssociation struct {
-	Account  go_types.Int64String `json:"account"`
-	Contact  go_types.Int64String `json:"contact"`
-	JobTitle string               `json:"jobTitle"`
-	Links    *Links               `json:"links"`
-	Id       go_types.Int64String `json:"id"`
+	Account  go_types.Int64String  `json:"account"`
+	Contact  go_types.Int64String  `json:"contact"`
+	JobTitle string                `json:"jobTitle,omitempty"`
+	Links    *Links                `json:"links,omitempty"`
+	Id       *go_types.Int64String `json:"id,omitempty"`
 }
 
 type GetAccountContactAssociationsConfig struct {
@@ -81,4 +81,44 @@ func (service *Service) GetAccountContactAssociations(getAccountContactAssociati
 	}
 
 	return &accountContactAssociations, nil
+}
+
+func (service *Service) CreateAccountContactAssociation(accountContactAssociation *AccountContactAssociation) (*AccountContactAssociation, *errortools.Error) {
+	var accountContactAssociationNew AccountContactAssociation
+
+	requestConfig := go_http.RequestConfig{
+		Method: http.MethodPost,
+		Url:    service.url("accountContacts"),
+		BodyModel: struct {
+			AccountContact AccountContactAssociation `json:"accountContact"`
+		}{*accountContactAssociation},
+		ResponseModel: &accountContactAssociationNew,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &accountContactAssociationNew, nil
+}
+
+func (service *Service) UpdateAccountContactAssociation(id int64, accountContactAssociation *AccountContactAssociation) (*AccountContactAssociation, *errortools.Error) {
+	var accountContactAssociationUpdated AccountContactAssociation
+
+	requestConfig := go_http.RequestConfig{
+		Method: http.MethodPut,
+		Url:    service.url(fmt.Sprintf("accountContacts/%v", id)),
+		BodyModel: struct {
+			AccountContact AccountContactAssociation `json:"accountContact"`
+		}{*accountContactAssociation},
+		ResponseModel: &accountContactAssociationUpdated,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &accountContactAssociationUpdated, nil
 }

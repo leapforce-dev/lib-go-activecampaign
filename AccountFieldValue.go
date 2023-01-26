@@ -18,14 +18,14 @@ type AccountFieldValues struct {
 }
 
 type AccountFieldValue struct {
-	Id                        go_types.Int64String   `json:"id"`
-	AccountCustomFieldMetumId int64                  `json:"accountCustomFieldMetumId"`
-	CustomFieldId             int64                  `json:"customFieldId"`
-	CreatedTimestamp          a_types.DateTimeString `json:"created_timestamp"`
-	UpdatedTimestamp          a_types.DateTimeString `json:"updated_timestamp"`
-	FieldValue                string                 `json:"fieldValue"`
-	AccountId                 int64                  `json:"accountId"`
-	Links                     *Links                 `json:"links"`
+	Id                  go_types.Int64String   `json:"id"`
+	AccountFieldMetumId int64                  `json:"accountCustomFieldMetumId"`
+	FieldId             int64                  `json:"customFieldId"`
+	CreatedTimestamp    a_types.DateTimeString `json:"created_timestamp"`
+	UpdatedTimestamp    a_types.DateTimeString `json:"updated_timestamp"`
+	FieldValue          string                 `json:"fieldValue"`
+	AccountId           int64                  `json:"accountId"`
+	Links               *Links                 `json:"links"`
 }
 
 type GetAccountFieldValuesConfig struct {

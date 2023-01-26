@@ -277,11 +277,37 @@ func (service *Service) SyncContact(contactCreate ContactSync) (*Contact, *error
 	return &contactCreated.Contact, nil
 }
 
-func (service *Service) UpdateContact(contactId string, contactCreate ContactSync) (*Contact, *errortools.Error) {
+func (service *Service) CreateContact(contactCreate ContactSync) (*Contact, *errortools.Error) {
 	d := struct {
 		Contact ContactSync `json:"contact"`
 	}{
 		Contact: contactCreate,
+	}
+
+	var contactCreated struct {
+		Contact Contact `json:"contact"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
+		Url:           service.url("contacts"),
+		BodyModel:     d,
+		ResponseModel: &contactCreated,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &contactCreated.Contact, nil
+}
+
+func (service *Service) UpdateContact(contactId int64, contactUpdate ContactSync) (*Contact, *errortools.Error) {
+	d := struct {
+		Contact ContactSync `json:"contact"`
+	}{
+		Contact: contactUpdate,
 	}
 
 	var contactUpdated struct {
@@ -289,8 +315,8 @@ func (service *Service) UpdateContact(contactId string, contactCreate ContactSyn
 	}
 
 	requestConfig := go_http.RequestConfig{
-		Method:        http.MethodPost,
-		Url:           service.url(fmt.Sprintf("contacts/%s", contactId)),
+		Method:        http.MethodPut,
+		Url:           service.url(fmt.Sprintf("contacts/%v", contactId)),
 		BodyModel:     d,
 		ResponseModel: &contactUpdated,
 	}
