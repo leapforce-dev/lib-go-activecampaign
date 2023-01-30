@@ -1,9 +1,11 @@
 package activecampaign
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -219,10 +221,58 @@ type ContactResponse struct {
 	ContactLists       *[]ContactList               `json:"contactLists"`
 	Deals              *[]Deal                      `json:"deals"`
 	FieldValues        *[]ContactFieldValue         `json:"fieldValues"`
-	GeoIps             *[]string                    `json:"geoIps"`
+	GeoIps             *GeoIps                      `json:"geoIps"`
 	Accounts           *[]Account                   `json:"accounts"`
 	AccountContacts    *[]AccountContactAssociation `json:"accountContacts"`
 	Contact            Contact                      `json:"contact"`
+}
+
+type GeoIps []GeoIp
+
+type GeoIp struct {
+	Contact    string    `json:"contact"`
+	CampaignId string    `json:"campaignid"`
+	MessageId  string    `json:"messageid"`
+	GeoAddrId  string    `json:"geoaddrid"`
+	Ip4        string    `json:"ip4"`
+	Tstamp     time.Time `json:"tstamp"`
+	GeoAddress string    `json:"geoAddress"`
+	Links      struct {
+		GeoAddress string `json:"geoAddress"`
+	} `json:"links"`
+	Id string `json:"id"`
+}
+
+func (g *GeoIp) UnmarshalJSON(b []byte) error {
+	var returnError = func() error {
+		errortools.CaptureError(fmt.Sprintf("Cannot parse '%s' to GeoIp", string(b)))
+		return nil
+	}
+
+	type geoIp GeoIp
+
+	var g1 geoIp
+
+	err := json.Unmarshal(b, &g1)
+	if err != nil {
+		var s string
+		err = json.Unmarshal(b, &s)
+		if err != nil {
+			return returnError()
+		}
+		_, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return returnError()
+		}
+
+		*g = GeoIp{
+			Id: s,
+		}
+	} else {
+		*g = GeoIp(g1)
+	}
+
+	return nil
 }
 
 func (service *Service) GetContact(contactId int64) (*ContactResponse, *errortools.Error) {
