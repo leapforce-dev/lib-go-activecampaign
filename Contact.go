@@ -55,7 +55,7 @@ type Contact struct {
 	UpdatedTimestamp     a_types.DateTimeString          `json:"updated_timestamp"`
 	CreatedBy            *go_types.Int64String           `json:"created_by"`
 	UpdatedBy            *go_types.Int64String           `json:"updated_by"`
-	EmailEmpty           bool                            `json:"email_empty"`
+	EmailEmpty           *int                            `json:"email_empty"`
 	ScoreValues          *go_types.Int64Strings          `json:"scoreValues"`
 	AccountContacts      *go_types.Int64Strings          `json:"accountContacts"`
 	ContactAutomationIds *go_types.Int64Strings          `json:"contactAutomations"`
