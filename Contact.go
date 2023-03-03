@@ -75,6 +75,7 @@ type ContactSync struct {
 	Email       string              `json:"email"`
 	FirstName   string              `json:"firstName,omitempty"`
 	LastName    string              `json:"lastName,omitempty"`
+	FullName    string              `json:"fullName,omitempty"`
 	Phone       string              `json:"phone,omitempty"`
 	FieldValues []ContactFieldValue `json:"fieldValues,omitempty"`
 }

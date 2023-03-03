@@ -152,6 +152,7 @@ type DealCreate struct {
 	Value          *int64                  `json:"value,omitempty"`
 	Currency       *string                 `json:"currency,omitempty"`
 	WinProbability *int64                  `json:"winProbability,omitempty"`
+	Status         *int64                  `json:"status"`
 	Fields         *[]DealFieldValueCreate `json:"fields,omitempty"`
 }
 
