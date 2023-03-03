@@ -1,6 +1,7 @@
 package activecampaign
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -138,4 +139,54 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 	}
 
 	return &deals, nil
+}
+
+type DealCreate struct {
+	Id             *string                 `json:"id,omitempty"`
+	OwnerId        *string                 `json:"owner,omitempty"`
+	ContactId      *string                 `json:"contact,omitempty"`
+	GroupId        *string                 `json:"group,omitempty"`
+	StageId        *string                 `json:"stage,omitempty"`
+	Title          *string                 `json:"title,omitempty"`
+	Description    *string                 `json:"description,omitempty"`
+	Value          *int64                  `json:"value,omitempty"`
+	Currency       *string                 `json:"currency,omitempty"`
+	WinProbability *int64                  `json:"winProbability,omitempty"`
+	Fields         *[]DealFieldValueCreate `json:"fields,omitempty"`
+}
+
+type DealFieldValueCreate struct {
+	CustomFieldId int64           `json:"customFieldId"`
+	FieldValue    json.RawMessage `json:"fieldValue"`
+	FieldCurrency *string         `json:"fieldCurrency,omitempty"`
+}
+
+func (service *Service) CreateDeal(deal *DealCreate) (*DealCreate, *errortools.Error) {
+	if deal == nil {
+		return nil, nil
+	}
+
+	d := struct {
+		Deal DealCreate `json:"deal"`
+	}{
+		Deal: *deal,
+	}
+
+	var dealCreated struct {
+		Deal DealCreate `json:"deal"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
+		Url:           service.url("deals"),
+		BodyModel:     d,
+		ResponseModel: &dealCreated,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &dealCreated.Deal, nil
 }
