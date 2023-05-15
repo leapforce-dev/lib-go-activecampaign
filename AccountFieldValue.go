@@ -1,6 +1,7 @@
 package activecampaign
 
 import (
+	"encoding/json"
 	"fmt"
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
@@ -23,7 +24,7 @@ type AccountFieldValue struct {
 	FieldId             int64                  `json:"customFieldId"`
 	CreatedTimestamp    a_types.DateTimeString `json:"created_timestamp"`
 	UpdatedTimestamp    a_types.DateTimeString `json:"updated_timestamp"`
-	FieldValue          string                 `json:"fieldValue"`
+	FieldValue          json.RawMessage        `json:"fieldValue"`
 	AccountId           int64                  `json:"accountId"`
 	Links               *Links                 `json:"links"`
 }

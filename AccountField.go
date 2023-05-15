@@ -1,6 +1,7 @@
 package activecampaign
 
 import (
+	"encoding/json"
 	"fmt"
 	a_types "github.com/leapforce-libraries/go_activecampaign/types"
 	errortools "github.com/leapforce-libraries/go_errortools"
@@ -20,8 +21,8 @@ type AccountField struct {
 	FieldLabel           string                 `json:"fieldLabel"`
 	FieldType            string                 `json:"fieldType"`
 	FieldOptions         *[]string              `json:"fieldOptions"`
-	FieldDefault         *string                `json:"fieldDefault"`
-	FieldDefaultCurrency *string                `json:"fieldDefaultCurrency"`
+	FieldDefault         json.RawMessage        `json:"fieldDefault"`
+	FieldDefaultCurrency json.RawMessage        `json:"fieldDefaultCurrency"`
 	IsFormVisible        go_types.BoolInt       `json:"isFormVisible"`
 	IsRequired           go_types.BoolInt       `json:"isRequired"`
 	DisplayOrder         int64                  `json:"displayOrder"`
