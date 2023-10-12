@@ -36,7 +36,7 @@ type GetTagsConfig struct {
 	Search *string
 }
 
-func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortools.Error) {
+func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, bool, *errortools.Error) {
 	params := url.Values{}
 
 	tags := Tags{}
@@ -70,7 +70,7 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		tags.Tags = append(tags.Tags, tagsBatch.Tags...)
@@ -84,9 +84,9 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, *errortool
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &tags, nil
+			return &tags, true, nil
 		}
 	}
 
-	return &tags, nil
+	return &tags, false, nil
 }

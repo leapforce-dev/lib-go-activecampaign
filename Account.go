@@ -34,7 +34,7 @@ type GetAccountsConfig struct {
 	CountDeals *bool
 }
 
-func (service *Service) GetAccounts(getAccountsConfig *GetAccountsConfig) (*Accounts, *errortools.Error) {
+func (service *Service) GetAccounts(getAccountsConfig *GetAccountsConfig) (*Accounts, bool, *errortools.Error) {
 	params := url.Values{}
 
 	accounts := Accounts{}
@@ -70,7 +70,7 @@ func (service *Service) GetAccounts(getAccountsConfig *GetAccountsConfig) (*Acco
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		accounts.Accounts = append(accounts.Accounts, accountsBatch.Accounts...)
@@ -84,11 +84,11 @@ func (service *Service) GetAccounts(getAccountsConfig *GetAccountsConfig) (*Acco
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &accounts, nil
+			return &accounts, true, nil
 		}
 	}
 
-	return &accounts, nil
+	return &accounts, false, nil
 }
 
 type AccountSync struct {

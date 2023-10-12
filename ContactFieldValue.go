@@ -35,7 +35,7 @@ type GetContactFieldValuesConfig struct {
 	Value     *string
 }
 
-func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFieldValuesConfig) (*ContactFieldValues, *errortools.Error) {
+func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFieldValuesConfig) (*ContactFieldValues, bool, *errortools.Error) {
 	params := url.Values{}
 
 	fieldValues := ContactFieldValues{}
@@ -62,8 +62,8 @@ func (service *Service) GetContactFieldValues(getFieldValuesConfig *GetContactFi
 
 	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
-		return nil, e
+		return nil, true, e
 	}
 
-	return &fieldValues, nil
+	return &fieldValues, false, nil
 }

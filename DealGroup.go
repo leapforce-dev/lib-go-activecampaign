@@ -41,7 +41,7 @@ type GetDealGroupsConfig struct {
 	OrderByPopular *OrderByDirection
 }
 
-func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) (*DealGroups, *errortools.Error) {
+func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) (*DealGroups, bool, *errortools.Error) {
 	params := url.Values{}
 
 	dealGroups := DealGroups{}
@@ -87,7 +87,7 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		if dealGroupsBatch.DealStages != nil {
@@ -112,9 +112,9 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &dealGroups, nil
+			return &dealGroups, true, nil
 		}
 	}
 
-	return &dealGroups, nil
+	return &dealGroups, false, nil
 }

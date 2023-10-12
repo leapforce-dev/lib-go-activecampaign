@@ -65,7 +65,7 @@ type GetDealsConfig struct {
 	Include      *[]DealInclude
 }
 
-func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *errortools.Error) {
+func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, bool, *errortools.Error) {
 	params := url.Values{}
 
 	deals := Deals{}
@@ -109,7 +109,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		if dealsBatch.FieldValues != nil {
@@ -134,11 +134,11 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, *error
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &deals, nil
+			return &deals, true, nil
 		}
 	}
 
-	return &deals, nil
+	return &deals, false, nil
 }
 
 type DealCreate struct {

@@ -44,7 +44,7 @@ type GetContactAutomationsConfig struct {
 	ContactId *int64
 }
 
-func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetContactAutomationsConfig) (*ContactAutomations, *errortools.Error) {
+func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetContactAutomationsConfig) (*ContactAutomations, bool, *errortools.Error) {
 	params := url.Values{}
 
 	contactAutomations := ContactAutomations{}
@@ -80,7 +80,7 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		contactAutomations.ContactAutomations = append(contactAutomations.ContactAutomations, contactAutomationsBatch.ContactAutomations...)
@@ -94,9 +94,9 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &contactAutomations, nil
+			return &contactAutomations, true, nil
 		}
 	}
 
-	return &contactAutomations, nil
+	return &contactAutomations, false, nil
 }

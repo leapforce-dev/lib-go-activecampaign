@@ -29,7 +29,7 @@ type GetAccountContactAssociationsConfig struct {
 	ContactId *int64
 }
 
-func (service *Service) GetAccountContactAssociations(getAccountContactAssociationsConfig *GetAccountContactAssociationsConfig) (*AccountContactAssociations, *errortools.Error) {
+func (service *Service) GetAccountContactAssociations(getAccountContactAssociationsConfig *GetAccountContactAssociationsConfig) (*AccountContactAssociations, bool, *errortools.Error) {
 	params := url.Values{}
 
 	accountContactAssociations := AccountContactAssociations{}
@@ -62,7 +62,7 @@ func (service *Service) GetAccountContactAssociations(getAccountContactAssociati
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		accountContactAssociations.AccountContactAssociations = append(accountContactAssociations.AccountContactAssociations, accountContactAssociationsBatch.AccountContactAssociations...)
@@ -76,11 +76,11 @@ func (service *Service) GetAccountContactAssociations(getAccountContactAssociati
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &accountContactAssociations, nil
+			return &accountContactAssociations, true, nil
 		}
 	}
 
-	return &accountContactAssociations, nil
+	return &accountContactAssociations, false, nil
 }
 
 func (service *Service) CreateAccountContactAssociation(accountContactAssociation *AccountContactAssociation) (*AccountContactAssociation, *errortools.Error) {

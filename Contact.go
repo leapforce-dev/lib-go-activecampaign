@@ -99,7 +99,7 @@ type GetContactsConfig struct {
 	Include      *[]ContactInclude
 }
 
-func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*ContactsResponse, *errortools.Error) {
+func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*ContactsResponse, bool, *errortools.Error) {
 	params := url.Values{}
 
 	contacts := ContactsResponse{}
@@ -149,7 +149,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		if contactsBatch.ContactAutomations != nil {
@@ -210,11 +210,11 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &contacts, nil
+			return &contacts, true, nil
 		}
 	}
 
-	return &contacts, nil
+	return &contacts, false, nil
 }
 
 type ContactResponse struct {

@@ -34,7 +34,7 @@ type GetContactTagsConfig struct {
 	ContactId *int64
 }
 
-func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfig) (*ContactTags, *errortools.Error) {
+func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfig) (*ContactTags, bool, *errortools.Error) {
 	params := url.Values{}
 
 	contactTags := ContactTags{}
@@ -70,7 +70,7 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		contactTags.ContactTags = append(contactTags.ContactTags, contactTagsBatch.ContactTags...)
@@ -84,9 +84,9 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &contactTags, nil
+			return &contactTags, true, nil
 		}
 	}
 
-	return &contactTags, nil
+	return &contactTags, false, nil
 }

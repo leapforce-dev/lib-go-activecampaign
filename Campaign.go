@@ -111,7 +111,7 @@ type GetCampaignsConfig struct {
 	OrderBySendDate *OrderByDirection
 }
 
-func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*Campaigns, *errortools.Error) {
+func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*Campaigns, bool, *errortools.Error) {
 	params := url.Values{}
 
 	campaigns := Campaigns{}
@@ -145,7 +145,7 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		campaigns.Campaigns = append(campaigns.Campaigns, campaignsBatch.Campaigns...)
@@ -159,9 +159,9 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &campaigns, nil
+			return &campaigns, true, nil
 		}
 	}
 
-	return &campaigns, nil
+	return &campaigns, false, nil
 }

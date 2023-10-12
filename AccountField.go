@@ -39,7 +39,7 @@ type GetAccountFieldsConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountFieldsConfig) (*AccountFields, *errortools.Error) {
+func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountFieldsConfig) (*AccountFields, bool, *errortools.Error) {
 	params := url.Values{}
 
 	accountFields := AccountFields{}
@@ -66,7 +66,7 @@ func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountField
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		accountFields.AccountFields = append(accountFields.AccountFields, accountFieldsBatch.AccountFields...)
@@ -80,9 +80,9 @@ func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountField
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &accountFields, nil
+			return &accountFields, true, nil
 		}
 	}
 
-	return &accountFields, nil
+	return &accountFields, false, nil
 }

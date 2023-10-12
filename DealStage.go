@@ -42,7 +42,7 @@ type GetDealStagesConfig struct {
 	OrderByTitle *OrderByDirection
 }
 
-func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) (*DealStages, *errortools.Error) {
+func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) (*DealStages, bool, *errortools.Error) {
 	params := url.Values{}
 
 	dealStages := DealStages{}
@@ -81,7 +81,7 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		if len(dealStagesBatch.DealStages) < int(limit) {
@@ -93,9 +93,9 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &dealStages, nil
+			return &dealStages, true, nil
 		}
 	}
 
-	return &dealStages, nil
+	return &dealStages, false, nil
 }

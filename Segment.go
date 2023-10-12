@@ -34,7 +34,7 @@ type GetSegmentsConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segments, *errortools.Error) {
+func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segments, bool, *errortools.Error) {
 	params := url.Values{}
 
 	segments := Segments{}
@@ -65,7 +65,7 @@ func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segm
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		segments.Segments = append(segments.Segments, segmentsBatch.Segments...)
@@ -79,9 +79,9 @@ func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segm
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &segments, nil
+			return &segments, true, nil
 		}
 	}
 
-	return &segments, nil
+	return &segments, false, nil
 }

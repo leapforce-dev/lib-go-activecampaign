@@ -48,7 +48,7 @@ type GetMessagesConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Messages, *errortools.Error) {
+func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Messages, bool, *errortools.Error) {
 	params := url.Values{}
 
 	messages := Messages{}
@@ -79,7 +79,7 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		messages.Messages = append(messages.Messages, messagesBatch.Messages...)
@@ -93,9 +93,9 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &messages, nil
+			return &messages, true, nil
 		}
 	}
 
-	return &messages, nil
+	return &messages, false, nil
 }

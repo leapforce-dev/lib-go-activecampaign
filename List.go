@@ -73,7 +73,7 @@ type GetListsConfig struct {
 	Name   *string
 }
 
-func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *errortools.Error) {
+func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, bool, *errortools.Error) {
 	params := url.Values{}
 
 	lists := Lists{}
@@ -106,7 +106,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		lists.Lists = append(lists.Lists, listsBatch.Lists...)
@@ -120,9 +120,9 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, *error
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &lists, nil
+			return &lists, true, nil
 		}
 	}
 
-	return &lists, nil
+	return &lists, false, nil
 }

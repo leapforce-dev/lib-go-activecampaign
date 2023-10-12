@@ -37,7 +37,7 @@ type GetDealFieldsConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) (*DealFields, *errortools.Error) {
+func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) (*DealFields, bool, *errortools.Error) {
 	params := url.Values{}
 
 	dealFields := DealFields{}
@@ -68,7 +68,7 @@ func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) 
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		dealFields.DealFields = append(dealFields.DealFields, dealFieldsBatch.DealFields...)
@@ -82,9 +82,9 @@ func (service *Service) GetDealFields(getDealFieldsConfig *GetDealFieldsConfig) 
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &dealFields, nil
+			return &dealFields, true, nil
 		}
 	}
 
-	return &dealFields, nil
+	return &dealFields, false, nil
 }

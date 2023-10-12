@@ -65,7 +65,7 @@ type GetContactFieldsConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetContactFields(getContactFieldsConfig *GetContactFieldsConfig) (*ContactFields, *errortools.Error) {
+func (service *Service) GetContactFields(getContactFieldsConfig *GetContactFieldsConfig) (*ContactFields, bool, *errortools.Error) {
 	params := url.Values{}
 
 	contactFields := ContactFields{}
@@ -96,7 +96,7 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		contactFields.ContactFields = append(contactFields.ContactFields, contactFieldsBatch.ContactFields...)
@@ -110,9 +110,9 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &contactFields, nil
+			return &contactFields, true, nil
 		}
 	}
 
-	return &contactFields, nil
+	return &contactFields, false, nil
 }

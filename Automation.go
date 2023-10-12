@@ -35,7 +35,7 @@ type GetAutomationsConfig struct {
 	Offset *uint64
 }
 
-func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfig) (*Automations, *errortools.Error) {
+func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfig) (*Automations, bool, *errortools.Error) {
 	params := url.Values{}
 
 	automations := Automations{}
@@ -66,7 +66,7 @@ func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfi
 
 		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
-			return nil, e
+			return nil, false, e
 		}
 
 		automations.Automations = append(automations.Automations, automationsBatch.Automations...)
@@ -80,9 +80,9 @@ func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfi
 		rowCount += limit
 
 		if rowCount >= service.maxRowCount {
-			return &automations, nil
+			return &automations, false, nil
 		}
 	}
 
-	return &automations, nil
+	return &automations, false, nil
 }
