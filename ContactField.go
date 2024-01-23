@@ -99,6 +99,8 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 			return nil, false, e
 		}
 
+		contactFields.FieldOptions = append(contactFields.FieldOptions, contactFieldsBatch.FieldOptions...)
+		contactFields.FieldRelations = append(contactFields.FieldRelations, contactFieldsBatch.FieldRelations...)
 		contactFields.ContactFields = append(contactFields.ContactFields, contactFieldsBatch.ContactFields...)
 
 		if len(contactFieldsBatch.ContactFields) < int(limit) {

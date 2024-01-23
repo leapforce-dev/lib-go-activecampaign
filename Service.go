@@ -88,7 +88,9 @@ func (service *Service) httpRequest(requestConfig *go_http.RequestConfig) (*http
 	(*requestConfig).ErrorModel = service.errorResponse
 
 	request, response, e := service.httpService.HttpRequest(requestConfig)
-	service.errorResponse.StatusCode = response.StatusCode
+	if response != nil {
+		service.errorResponse.StatusCode = response.StatusCode
+	}
 	if service.errorResponse.Message != "" {
 		e.SetMessage(service.errorResponse.Message)
 	} else if len(service.errorResponse.Errors) > 0 {
