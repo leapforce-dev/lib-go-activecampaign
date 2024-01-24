@@ -16,15 +16,15 @@ type Accounts struct {
 }
 
 type Account struct {
-	Name                string                 `json:"name"`
-	AccountUrl          *go_types.String       `json:"accountUrl"`
-	CreatedUtcTimestamp a_types.DateTimeString `json:"created_utc_timestamp"`
-	UpdatedUtcTimestamp a_types.DateTimeString `json:"updated_utc_timestamp"`
-	ContactCount        go_types.Int64String   `json:"contactCount"`
-	DealCount           go_types.Int64String   `json:"dealCount"`
-	Owner               *a_types.Int64String   `json:"owner"`
-	Id                  go_types.Int64String   `json:"id"`
-	Links               *Links                 `json:"links"`
+	Name             string                 `json:"name"`
+	AccountUrl       *go_types.String       `json:"accountUrl"`
+	CreatedTimestamp a_types.DateTimeString `json:"created_timestamp"`
+	UpdatedTimestamp a_types.DateTimeString `json:"updated_timestamp"`
+	ContactCount     go_types.Int64String   `json:"contactCount"`
+	DealCount        go_types.Int64String   `json:"dealCount"`
+	Owner            *a_types.Int64String   `json:"owner"`
+	Id               go_types.Int64String   `json:"id"`
+	Links            *Links                 `json:"links"`
 }
 
 type GetAccountsConfig struct {
