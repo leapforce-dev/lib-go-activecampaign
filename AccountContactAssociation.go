@@ -83,6 +83,25 @@ func (service *Service) GetAccountContactAssociations(getAccountContactAssociati
 	return &accountContactAssociations, false, nil
 }
 
+func (service *Service) GetAccountContactAssociation(id int64) (*AccountContactAssociation, *errortools.Error) {
+	accountContactAssociation := struct {
+		AccountContact AccountContactAssociation `json:"accountContact"`
+	}{}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
+		Url:           service.url(fmt.Sprintf("accountContacts/%v", id)),
+		ResponseModel: &accountContactAssociation,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &accountContactAssociation.AccountContact, nil
+}
+
 func (service *Service) CreateAccountContactAssociation(accountContactAssociation *AccountContactAssociation) (*AccountContactAssociation, *errortools.Error) {
 	var accountContactAssociationNew AccountContactAssociation
 
