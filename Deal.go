@@ -141,6 +141,23 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, bool, 
 	return &deals, false, nil
 }
 
+func (service *Service) GetContactDeals(contactId int64) (*Deals, bool, *errortools.Error) {
+	deals := Deals{}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
+		Url:           service.url(fmt.Sprintf("contacts/%v/deals", contactId)),
+		ResponseModel: &deals,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, false, e
+	}
+
+	return &deals, false, nil
+}
+
 type DealCreate struct {
 	Id             *string                 `json:"id,omitempty"`
 	OwnerId        *string                 `json:"owner,omitempty"`
@@ -190,4 +207,30 @@ func (service *Service) CreateDeal(deal *DealCreate) (*DealCreate, *errortools.E
 	}
 
 	return &dealCreated.Deal, nil
+}
+
+func (service *Service) UpdateDeal(dealId int64, dealUpdate DealCreate) (*Deal, *errortools.Error) {
+	d := struct {
+		Deal DealCreate `json:"deal"`
+	}{
+		Deal: dealUpdate,
+	}
+
+	var dealUpdated struct {
+		Deal Deal `json:"deal"`
+	}
+
+	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPut,
+		Url:           service.url(fmt.Sprintf("deals/%v", dealId)),
+		BodyModel:     d,
+		ResponseModel: &dealUpdated,
+	}
+
+	_, _, e := service.httpRequest(&requestConfig)
+	if e != nil {
+		return nil, e
+	}
+
+	return &dealUpdated.Deal, nil
 }
