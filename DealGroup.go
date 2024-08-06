@@ -50,7 +50,7 @@ func (service *Service) GetDealGroups(getDealGroupsConfig *GetDealGroupsConfig) 
 
 	if getDealGroupsConfig != nil {
 		if getDealGroupsConfig.Limit != nil {
-			limit = *getDealGroupsConfig.Limit
+			limit = getLimit(*getDealGroupsConfig.Limit)
 		}
 		if getDealGroupsConfig.Offset != nil {
 			service.nextOffsets.DealGroup = *getDealGroupsConfig.Offset

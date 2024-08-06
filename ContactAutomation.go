@@ -58,7 +58,7 @@ func (service *Service) GetContactAutomations(getContactAutomationsConfig *GetCo
 			path = fmt.Sprintf("contacts/%v/contactAutomations", *getContactAutomationsConfig.ContactId)
 		}
 		if getContactAutomationsConfig.Limit != nil {
-			limit = *getContactAutomationsConfig.Limit
+			limit = getLimit(*getContactAutomationsConfig.Limit)
 		}
 		if getContactAutomationsConfig.Offset != nil {
 			service.nextOffsets.ContactAutomation = *getContactAutomationsConfig.Offset

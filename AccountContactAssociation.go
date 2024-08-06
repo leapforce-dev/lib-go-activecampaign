@@ -38,7 +38,7 @@ func (service *Service) GetAccountContactAssociations(getAccountContactAssociati
 
 	if getAccountContactAssociationsConfig != nil {
 		if getAccountContactAssociationsConfig.Limit != nil {
-			limit = *getAccountContactAssociationsConfig.Limit
+			limit = getLimit(*getAccountContactAssociationsConfig.Limit)
 		}
 		if getAccountContactAssociationsConfig.AccountId != nil {
 			params.Add("filters[account]", fmt.Sprintf("%v", *getAccountContactAssociationsConfig.AccountId))

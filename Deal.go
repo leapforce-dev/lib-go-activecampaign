@@ -74,7 +74,7 @@ func (service *Service) GetDeals(getDealsConfig *GetDealsConfig) (*Deals, bool, 
 
 	if getDealsConfig != nil {
 		if getDealsConfig.Limit != nil {
-			limit = *getDealsConfig.Limit
+			limit = getLimit(*getDealsConfig.Limit)
 		}
 		if getDealsConfig.Offset != nil {
 			service.nextOffsets.Deal = *getDealsConfig.Offset

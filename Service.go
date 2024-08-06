@@ -10,8 +10,9 @@ import (
 
 const (
 	apiName            string = "ActiveCampaign"
-	defaultMaxRowCount uint64 = ^uint64(0)
+	defaultMaxRowCount        = ^uint64(0)
 	defaultLimit       uint64 = 100
+	maxLimit           uint64 = 100
 	timestampLayout    string = "2006-01-02 15:04:05"
 )
 
@@ -130,4 +131,12 @@ func (service Service) ApiReset() {
 
 func (service *Service) ErrorResponse() *ErrorResponse {
 	return service.errorResponse
+}
+
+func getLimit(limit uint64) uint64 {
+	if limit < maxLimit {
+		return limit
+	}
+
+	return maxLimit
 }

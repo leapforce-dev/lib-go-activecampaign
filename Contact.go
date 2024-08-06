@@ -108,7 +108,7 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 
 	if getContactsConfig != nil {
 		if getContactsConfig.Limit != nil {
-			limit = *getContactsConfig.Limit
+			limit = getLimit(*getContactsConfig.Limit)
 		}
 		if getContactsConfig.Offset != nil {
 			service.nextOffsets.Contact = *getContactsConfig.Offset
@@ -212,6 +212,8 @@ func (service *Service) GetContacts(getContactsConfig *GetContactsConfig) (*Cont
 		if rowCount >= service.maxRowCount {
 			return &contacts, true, nil
 		}
+
+		fmt.Println(contactsBatch.Meta.PageInput.Limit, contactsBatch.Meta.PageInput.Offset, contactsBatch.Meta.Total, rowCount)
 	}
 
 	return &contacts, false, nil

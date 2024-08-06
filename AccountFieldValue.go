@@ -44,7 +44,7 @@ func (service *Service) GetAccountFieldValues(getAccountFieldValuesConfig *GetAc
 
 	if getAccountFieldValuesConfig != nil {
 		if getAccountFieldValuesConfig.Limit != nil {
-			limit = *getAccountFieldValuesConfig.Limit
+			limit = getLimit(*getAccountFieldValuesConfig.Limit)
 		}
 		if getAccountFieldValuesConfig.AccountId != nil {
 			params.Add("filters[customerAccountId]", fmt.Sprintf("%v", *getAccountFieldValuesConfig.AccountId))

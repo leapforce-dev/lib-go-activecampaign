@@ -51,7 +51,7 @@ func (service *Service) GetDealStages(getDealStagesConfig *GetDealStagesConfig) 
 
 	if getDealStagesConfig != nil {
 		if getDealStagesConfig.Limit != nil {
-			limit = *getDealStagesConfig.Limit
+			limit = getLimit(*getDealStagesConfig.Limit)
 		}
 		if getDealStagesConfig.Offset != nil {
 			service.nextOffsets.DealStage = *getDealStagesConfig.Offset

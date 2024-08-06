@@ -48,7 +48,7 @@ func (service *Service) GetContactTags(getContactTagsConfig *GetContactTagsConfi
 			path = fmt.Sprintf("contacts/%v/contactTags", *getContactTagsConfig.ContactId)
 		}
 		if getContactTagsConfig.Limit != nil {
-			limit = *getContactTagsConfig.Limit
+			limit = getLimit(*getContactTagsConfig.Limit)
 		}
 		if getContactTagsConfig.Offset != nil {
 			service.nextOffsets.ContactTag = *getContactTagsConfig.Offset

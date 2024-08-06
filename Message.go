@@ -57,7 +57,7 @@ func (service *Service) GetMessages(getMessagesConfig *GetMessagesConfig) (*Mess
 
 	if getMessagesConfig != nil {
 		if getMessagesConfig.Limit != nil {
-			limit = *getMessagesConfig.Limit
+			limit = getLimit(*getMessagesConfig.Limit)
 		}
 		if getMessagesConfig.Offset != nil {
 			service.nextOffsets.Message = *getMessagesConfig.Offset

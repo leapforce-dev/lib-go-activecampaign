@@ -123,7 +123,7 @@ func (service *Service) GetCampaigns(getCampaignsConfig *GetCampaignsConfig) (*C
 			params.Add("orders[sdate]", string(*getCampaignsConfig.OrderBySendDate))
 		}
 		if getCampaignsConfig.Limit != nil {
-			limit = *getCampaignsConfig.Limit
+			limit = getLimit(*getCampaignsConfig.Limit)
 		}
 		if getCampaignsConfig.Offset != nil {
 			service.nextOffsets.Campaign = *getCampaignsConfig.Offset

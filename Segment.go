@@ -43,7 +43,7 @@ func (service *Service) GetSegments(getSegmentsConfig *GetSegmentsConfig) (*Segm
 
 	if getSegmentsConfig != nil {
 		if getSegmentsConfig.Limit != nil {
-			limit = *getSegmentsConfig.Limit
+			limit = getLimit(*getSegmentsConfig.Limit)
 		}
 		if getSegmentsConfig.Offset != nil {
 			service.nextOffsets.Segment = *getSegmentsConfig.Offset

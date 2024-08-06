@@ -44,7 +44,7 @@ func (service *Service) GetAutomations(getAutomationsConfig *GetAutomationsConfi
 
 	if getAutomationsConfig != nil {
 		if getAutomationsConfig.Limit != nil {
-			limit = *getAutomationsConfig.Limit
+			limit = getLimit(*getAutomationsConfig.Limit)
 		}
 		if getAutomationsConfig.Offset != nil {
 			service.nextOffsets.Automation = *getAutomationsConfig.Offset

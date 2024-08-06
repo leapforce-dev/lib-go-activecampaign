@@ -43,8 +43,9 @@ func (service *Service) GetAccounts(getAccountsConfig *GetAccountsConfig) (*Acco
 
 	if getAccountsConfig != nil {
 		if getAccountsConfig.Limit != nil {
-			limit = *getAccountsConfig.Limit
+			limit = getLimit(*getAccountsConfig.Limit)
 		}
+
 		if getAccountsConfig.Offset != nil {
 			service.nextOffsets.Account = *getAccountsConfig.Offset
 		}

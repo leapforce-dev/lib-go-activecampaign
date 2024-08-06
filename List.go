@@ -85,7 +85,7 @@ func (service *Service) GetLists(getListsConfig *GetListsConfig) (*Lists, bool, 
 			params.Add("filters[name]", *getListsConfig.Name)
 		}
 		if getListsConfig.Limit != nil {
-			limit = *getListsConfig.Limit
+			limit = getLimit(*getListsConfig.Limit)
 		}
 		if getListsConfig.Offset != nil {
 			service.nextOffsets.List = *getListsConfig.Offset

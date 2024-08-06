@@ -53,7 +53,7 @@ func (service *Service) GetDealFieldValues(getFieldValuesConfig *GetDealFieldVal
 
 	if getFieldValuesConfig != nil {
 		if getFieldValuesConfig.Limit != nil {
-			limit = *getFieldValuesConfig.Limit
+			limit = getLimit(*getFieldValuesConfig.Limit)
 		}
 		if getFieldValuesConfig.Offset != nil {
 			service.nextOffsets.Deal = *getFieldValuesConfig.Offset

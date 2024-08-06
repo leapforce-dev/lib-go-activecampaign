@@ -48,7 +48,7 @@ func (service *Service) GetTags(getTagsConfig *GetTagsConfig) (*Tags, bool, *err
 			params.Add("search", *getTagsConfig.Search)
 		}
 		if getTagsConfig.Limit != nil {
-			limit = *getTagsConfig.Limit
+			limit = getLimit(*getTagsConfig.Limit)
 		}
 		if getTagsConfig.Offset != nil {
 			service.nextOffsets.Tag = *getTagsConfig.Offset

@@ -74,7 +74,7 @@ func (service *Service) GetContactFields(getContactFieldsConfig *GetContactField
 
 	if getContactFieldsConfig != nil {
 		if getContactFieldsConfig.Limit != nil {
-			limit = *getContactFieldsConfig.Limit
+			limit = getLimit(*getContactFieldsConfig.Limit)
 		}
 		if getContactFieldsConfig.Offset != nil {
 			service.nextOffsets.ContactField = *getContactFieldsConfig.Offset

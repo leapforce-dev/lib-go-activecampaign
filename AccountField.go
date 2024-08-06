@@ -48,7 +48,7 @@ func (service *Service) GetAccountFields(getAccountFieldsConfig *GetAccountField
 
 	if getAccountFieldsConfig != nil {
 		if getAccountFieldsConfig.Limit != nil {
-			limit = *getAccountFieldsConfig.Limit
+			limit = getLimit(*getAccountFieldsConfig.Limit)
 		}
 	}
 	params.Add("limit", fmt.Sprintf("%v", limit))
