@@ -11,6 +11,7 @@ import (
 const (
 	DateTimeFormat  string = "2006-01-02 15:04:05"
 	DateTimeFormat2 string = "2006-01-02T15:04:05-07:00"
+	DateTimeFormat3 string = "2006-01-02T15:04:05.999Z"
 )
 
 type DateTimeString time.Time
@@ -38,7 +39,10 @@ func (d *DateTimeString) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		_t, err = time.Parse(DateTimeFormat2, s)
 		if err != nil {
-			return returnError()
+			_t, err = time.Parse(DateTimeFormat3, s)
+			if err != nil {
+				return returnError()
+			}
 		}
 	}
 

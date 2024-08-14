@@ -14,6 +14,7 @@ const (
 	defaultLimit       uint64 = 100
 	maxLimit           uint64 = 100
 	timestampLayout    string = "2006-01-02 15:04:05"
+	timestampLayout2   string = "2006-01-02T15:04:05.000Z"
 )
 
 type Service struct {
@@ -69,6 +70,7 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 	if serviceConfig.MaxRowCount != nil {
 		maxRowCount = *serviceConfig.MaxRowCount
 	}
+
 	return &Service{
 		host:        serviceConfig.Host,
 		apiKey:      serviceConfig.ApiKey,
