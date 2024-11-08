@@ -1,7 +1,6 @@
 package activecampaign
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -174,9 +173,9 @@ type DealCreate struct {
 }
 
 type DealFieldValueCreate struct {
-	CustomFieldId int64           `json:"customFieldId"`
-	FieldValue    json.RawMessage `json:"fieldValue"`
-	FieldCurrency *string         `json:"fieldCurrency,omitempty"`
+	CustomFieldId int64   `json:"customFieldId"`
+	FieldValue    []byte  `json:"fieldValue"`
+	FieldCurrency *string `json:"fieldCurrency,omitempty"`
 }
 
 func (service *Service) CreateDeal(deal *DealCreate) (*DealCreate, *errortools.Error) {

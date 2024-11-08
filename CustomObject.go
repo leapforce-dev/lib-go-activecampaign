@@ -29,8 +29,8 @@ type CustomObjectRecordRecord struct {
 	ExternalId       string                          `json:"externalId"`
 	Fields           []CustomObjectRecordField       `json:"fields"`
 	Relationships    CustomObjectRecordRelationships `json:"relationships"`
-	CreatedTimestamp a_types.DateTimeString          `json:"createdTimestamp"`
-	UpdatedTimestamp a_types.DateTimeString          `json:"updatedTimestamp"`
+	CreatedTimestamp *a_types.DateTimeString         `json:"createdTimestamp"`
+	UpdatedTimestamp *a_types.DateTimeString         `json:"updatedTimestamp"`
 }
 
 type CustomObjectRecordRelationships struct {
@@ -98,8 +98,11 @@ func (service *Service) GetCustomObjectRecords(getCustomObjectRecordsConfig *Get
 
 		customObjectRecords.Records = append(customObjectRecords.Records, customObjectRecordsBatch.Records...)
 
-		maxCreatedTimestamp_ := customObjectRecordsBatch.Records[len(customObjectRecordsBatch.Records)-1].CreatedTimestamp.Value()
-		maxCreatedTimestamp = &maxCreatedTimestamp_
+		createdTimestamp := customObjectRecordsBatch.Records[len(customObjectRecordsBatch.Records)-1].CreatedTimestamp
+		if createdTimestamp != nil {
+			maxCreatedTimestamp_ := createdTimestamp.Value()
+			maxCreatedTimestamp = &maxCreatedTimestamp_
+		}
 	}
 
 	return &customObjectRecords, false, nil
